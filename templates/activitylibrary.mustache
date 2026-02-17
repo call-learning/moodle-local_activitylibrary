@@ -1,0 +1,85 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_activitylibrary/activitylibrary
+
+    This template renders the main content area for the Activity Library.
+
+    Example context (json):
+    {
+        "entitytype": "resource",
+        "parentid": 0,
+        "view": "cards",
+        "sortcolumn": "name",
+        "sortorder": "asc",
+        "paging": 10,
+        "noentitiesimg": "https://moodle.org/theme/image.php/boost/core/1602669996/i/empty",
+        "displaycategories": true,
+        "filtersformcontent": "<form>...</form>"
+    }
+}}
+
+<div id="local-activitylibrary-{{uniqid}}" class="local-activitylibrary block-cards" data-entity-type="{{entitytype}}" data-region="activitylibrary" role="navigation"
+     data-parent-id="{{parentid}}" data-category-id="{{categoryid}}" data-course-ids="{{courseids}}">
+
+    <div class="container-fluid">
+        <div class="row no-gutters">
+            <div class="col-12">
+                <div id="activitylibrary-filter-{{uniqid}}">
+                    {{{ filtersformcontent }}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid activitylibrary-content mt-4">
+        <div data-region="display-modifiers" class="d-flex align-items-right flex-wrap justify-content-end"
+                aria-label="{{#str}} aria:controls, local_activitylibrary {{/str}}">
+            <div id="activitylibrary-permalink"></div>
+
+            {{> local_activitylibrary/nav-sort-selector }}
+            {{> local_activitylibrary/nav-display-selector }}
+        </div>
+
+        <div class="container-fluid p-0">
+            <div id="entities-view-{{uniqid}}"
+                    data-region="activitylibrary-view"
+                    data-display="{{view}}"
+                    data-sort-column="{{sortcolumn}}"
+                    data-sort-order="{{sortorder}}"
+                    data-prev-display="{{view}}"
+                    data-paging="{{paging}}"
+                    data-noentitiesimg="{{noentitiesimg}}"
+                    data-displaycategories="{{displaycategories}}">
+                <div data-region="activitylibrary-view-content">
+                    {{> local_activitylibrary/placeholders }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{#js}}
+require(['jquery', 'local_activitylibrary/activitylibrary',
+    'local_activitylibrary/filtersform',
+    'local_activitylibrary/permalink'
+    ], function($, Main, FiltersForm, Permalink) {
+    var root = $('#local-activitylibrary-{{uniqid}}');
+    Main.init(root);
+    var filters = $('#activitylibrary-filter-{{uniqid}}');
+    FiltersForm.init(filters);
+    Permalink.init();
+});
+{{/js}}

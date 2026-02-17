@@ -1,0 +1,280 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Activity library - external function to get filtered list of activities.
+ *
+ * @package   local_activitylibrary
+ * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace local_activitylibrary\external;
+
+use context_course;
+use context_system;
+use core_course\external\course_module_summary_exporter;
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_multiple_structure;
+use core_external\external_single_structure;
+use core_external\external_value;
+use local_activitylibrary\locallib\customfield_utils;
+use moodle_url;
+
+/**
+ * External API for retrieving filtered activities.
+ */
+class get_filtered_activities extends external_api {
+    /**
+     * Returns description of method parameters.
+     *
+     * @return external_function_parameters
+     */
+    public static function execute_parameters() {
+        return new external_function_parameters(
+            [
+                'courseid' => new external_value(PARAM_INT, 'Course id', VALUE_DEFAULT, 0),
+                'courseids' => new external_multiple_structure(
+                    new external_value(PARAM_INT, 'Course id'),
+                    'List of course ids',
+                    VALUE_DEFAULT,
+                    []
+                ),
+                'filters' => new external_multiple_structure(
+                    new external_single_structure(
+                        [
+                            'type' => new external_value(PARAM_ALPHANUM,
+                                'Filter type as per customfield type.'),
+                            'shortname' => new external_value(PARAM_ALPHANUMEXT,
+                                'Matching customfield shortname if it is a customfield filter', VALUE_OPTIONAL),
+                            'operator' => new external_value(PARAM_INT,
+                                'Filter option as per local_activitylibrary\\filters options.'),
+                            'value' => new external_value(PARAM_RAW, 'The value of the filter to look for.'),
+                        ]
+                    ),
+                    'Filter the results',
+                    VALUE_OPTIONAL
+                ),
+                'limit' => new external_value(PARAM_INT, 'Result set limit', VALUE_DEFAULT, 0),
+                'offset' => new external_value(PARAM_INT, 'Result set offset', VALUE_DEFAULT, 0),
+                'sorting' => new external_multiple_structure(
+                    new external_single_structure(
+                        [
+                            'column' => new external_value(PARAM_ALPHANUM, 'Column name for sorting'),
+                            'order' => new external_value(PARAM_ALPHA,
+                                'ASC for ascending, DESC for descending; ascending by default'),
+                        ]
+                    ),
+                    'Sort the results',
+                    VALUE_OPTIONAL
+                ),
+            ]
+        );
+    }
+
+    /**
+     * Get activities from one course, several courses, or all courses.
+     *
+     * @param int $courseid
+     * @param array $courseids
+     * @param array $filters
+     * @param int $limit
+     * @param int $offset
+     * @param array $sorting
+     * @return array
+     */
+    public static function execute(
+        int $courseid = 0,
+        array $courseids = [],
+        array $filters = [],
+        int $limit = 0,
+        int $offset = 0,
+        array $sorting = []
+    ): array {
+        global $DB, $PAGE;
+
+        $inparams = compact(['courseid', 'courseids', 'filters', 'limit', 'offset', 'sorting']);
+        $params = self::validate_parameters(self::execute_parameters(), $inparams);
+        $context = context_system::instance();
+        if ($params['courseid'] > 0) {
+            $context = context_course::instance($params['courseid']);
+        }
+        self::validate_context($context);
+        $scopeids = array_values(array_unique(array_filter(array_map('intval', $params['courseids']))));
+        if ($params['courseid'] > 0) {
+            $scopeids = [$params['courseid']];
+        }
+
+        if (empty($scopeids)) {
+            $scopeids = array_map('intval', array_keys($DB->get_records_select_menu('course', 'id <> :siteid',
+                ['siteid' => SITEID], '', 'id, id')));
+        }
+
+        if (empty($scopeids)) {
+            return [];
+        }
+
+        [$insql, $inparams] = $DB->get_in_or_equal($scopeids, SQL_PARAMS_NAMED, 'courseid');
+        $sqlparams = $inparams;
+        $sqlwhere = "e.course {$insql} AND m.visible = 1";
+
+        $additionalfields = [
+            'fullname' => 'm.name AS fullname',
+            'modname' => 'm.name AS modname',
+            'parentid' => 'e.course AS parentid',
+            'category' => 'c.fullname AS category',
+            'categoryname' => 'c.fullname AS categoryname',
+            'timecreated' => 'e.added AS timecreated',
+            'timemodified' => 'e.added AS timemodified',
+        ];
+
+        $sortsql = self::get_sort_options_sql($params['sorting'], array_keys($additionalfields));
+        $handler = \local_activitylibrary\customfield\coursemodule_handler::create();
+        $records = customfield_utils::get_records_from_handler(
+            $handler,
+            $params['filters'],
+            0,
+            0,
+            [
+                'JOIN {modules} m ON m.id = e.module',
+                'JOIN {course} c ON c.id = e.course',
+            ],
+            $additionalfields,
+            $sqlwhere,
+            $sqlparams,
+            $sortsql
+        );
+
+        $renderer = $PAGE->get_renderer('core');
+        $modulesinfo = [];
+        $modinfos = [];
+        $courseimages = [];
+
+        foreach ($records as $record) {
+            if (empty($modinfos[$record->parentid])) {
+                $modinfos[$record->parentid] = get_fast_modinfo($record->parentid);
+                $courseimages[$record->parentid] = $renderer->get_generated_image_for_id($record->parentid);
+            }
+
+            $context = context_course::instance($record->parentid, IGNORE_MISSING);
+            if (!$context) {
+                continue;
+            }
+
+            try {
+                self::validate_context($context);
+            } catch (\Exception $e) {
+                continue;
+            }
+
+            $cm = $modinfos[$record->parentid]->get_cm($record->id);
+            if (!$cm->uservisible) {
+                continue;
+            }
+
+            $PAGE->set_context($context);
+            $exported = (array)(new course_module_summary_exporter(null, ['cm' => $cm]))->export($renderer);
+            $recorddata = (array)$record;
+            $recorddata['fullname'] = $cm->name;
+            $recorddata['idnumber'] = $cm->idnumber;
+            $recorddata['groupmode'] = $cm->groupmode;
+            $recorddata['groupingid'] = $cm->groupingid;
+            $recorddata['visible'] = (int)$cm->uservisible;
+            $recorddata['image'] = $courseimages[$record->parentid];
+
+            if ($cm->url) {
+                $recorddata['viewurl'] = $cm->url->out_as_local_url();
+            } else {
+                $recorddata['viewurl'] = (new moodle_url('/course/view.php', ['id' => $record->parentid]))->out(false);
+            }
+
+            $timemodified = $DB->get_field($cm->modname, 'timemodified', ['id' => $cm->instance]);
+            if (!empty($timemodified)) {
+                $recorddata['timemodified'] = (int)$timemodified;
+            }
+
+            $recorddata['iconurl'] = $exported['iconurl'] ?? '';
+            $recorddata['modname'] = $cm->modname;
+            $modulesinfo[] = $recorddata;
+        }
+
+        if (!empty($params['sorting'])) {
+            $firstsort = reset($params['sorting']);
+            $column = $firstsort['column'];
+            $order = strtoupper($firstsort['order']);
+            if ($column === 'timemodified') {
+                usort($modulesinfo, function($left, $right) use ($order) {
+                    $leftvalue = $left['timemodified'] ?? 0;
+                    $rightvalue = $right['timemodified'] ?? 0;
+                    return $order === 'DESC' ? $rightvalue <=> $leftvalue : $leftvalue <=> $rightvalue;
+                });
+            }
+        }
+
+        return array_slice($modulesinfo, $params['offset'], $params['limit'] ? $params['limit'] : null);
+    }
+
+    /**
+     * Returns description of method result value.
+     *
+     * @return external_multiple_structure
+     */
+    public static function execute_returns() {
+        return new external_multiple_structure(
+            new external_single_structure(
+                [
+                    'id' => new external_value(PARAM_INT, 'Activity id'),
+                    'parentid' => new external_value(PARAM_INT, 'Parent course id'),
+                    'fullname' => new external_value(PARAM_TEXT, 'Activity full name'),
+                    'idnumber' => new external_value(PARAM_RAW, 'Id number', VALUE_OPTIONAL),
+                    'modname' => new external_value(PARAM_RAW, 'Module name'),
+                    'iconurl' => new external_value(PARAM_RAW, 'Module icon URL', VALUE_OPTIONAL),
+                    'visible' => new external_value(PARAM_INT, '1 available, 0 unavailable', VALUE_OPTIONAL),
+                    'image' => new external_value(PARAM_RAW, 'Course image'),
+                    'groupmode' => new external_value(PARAM_INT, 'Group mode', VALUE_OPTIONAL),
+                    'groupingid' => new external_value(PARAM_INT, 'Grouping id', VALUE_OPTIONAL),
+                    'timecreated' => new external_value(PARAM_INT, 'Creation time', VALUE_OPTIONAL),
+                    'timemodified' => new external_value(PARAM_INT, 'Modification time', VALUE_OPTIONAL),
+                    'category' => new external_value(PARAM_TEXT, 'Course full name', VALUE_OPTIONAL),
+                    'categoryname' => new external_value(PARAM_TEXT, 'Course full name', VALUE_OPTIONAL),
+                    'viewurl' => new external_value(PARAM_URL, 'Activity URL'),
+                ],
+                'Activity summary'
+            )
+        );
+    }
+
+    /**
+     * Build SQL order by from sort options.
+     *
+     * @param array $sortoptions
+     * @param array $fields
+     * @return string
+     */
+    protected static function get_sort_options_sql(array $sortoptions, array $fields): string {
+        $sortsqls = [];
+        foreach ($sortoptions as $sort) {
+            $column = $sort['column'] ?? '';
+            $order = strtoupper($sort['order'] ?? '');
+            if (!in_array($column, $fields) || ($order !== 'ASC' && $order !== 'DESC')) {
+                continue;
+            }
+            $sortsqls[] = "{$column} {$order}";
+        }
+        return implode(',', $sortsqls);
+    }
+}

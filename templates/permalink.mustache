@@ -1,0 +1,41 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_activitylibrary/activitylibrary
+
+    This template renders the main content area for the Activity Library.
+
+    Example context (json):
+    {
+        "url" : "http://localhost/moodle/local/activitylibrary/index.php?id=2"
+    }
+}}
+<div class="activitylibrary_permalink">
+    <div class="input-group w-auto">
+        <div class="input-group-prepend">
+        <button class="btn btn-outline-secondary bnt-sm icon-no-margin d-flex justify-content-center align-items-center" id="activitylibrary_permalink-t-{{uniqid}}">
+            {{#pix}}fp/link_sm, theme, {{#str}}permalink:copy, local_activitylibrary{{/str}}{{/pix}}
+        </button>
+        </div>
+        <input id="activitylibrary_permalink-i-{{uniqid}}" type="textarea" readonly value="{{url}}" class="form-control form-control-sm">
+    </div>
+</div>
+{{#js}}
+    require(['local_activitylibrary/permalink'], function(Permalink) {
+    Permalink.setupCopyLink('activitylibrary_permalink-t-{{uniqid}}','activitylibrary_permalink-i-{{uniqid}}');
+    });
+{{/js}}

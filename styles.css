@@ -140,10 +140,6 @@
 
 .path-local-activitylibrary .dashboard-card-deck .dashboard-card {
     margin-bottom: .5rem;
-    flex-basis: auto;
-    width: 100%;
-    flex-grow: 0;
-    flex-shrink: 0;
 }
 
 .path-local-activitylibrary .dashboard-card-deck .dashboard-card .dashboard-card-img {
@@ -152,16 +148,4 @@
     background-size: cover;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
-}
-
-@media (min-width: 576px) {
-    .path-local-activitylibrary .dashboard-card-deck .dashboard-card.card-course {
-        width: calc(50% - 0.5rem);
-    }
-}
-
-@media (min-width: 840px) {
-    .path-local-activitylibrary .dashboard-card-deck .dashboard-card.card-course {
-        width: calc(33.33% - 0.5rem);
-    }
 }

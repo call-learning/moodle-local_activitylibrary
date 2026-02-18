@@ -50,7 +50,7 @@ if ($courseid != SITEID) {
     $pageparams['courseids'] = implode(',', $courseids);
 }
 
-$renderable = new local_activitylibrary\output\activity_activitylibrary($courseids, $courseid);
+$renderable = new local_activitylibrary\output\activity_activitylibrary($courseids);
 $PAGE->add_body_class('resource-library-activities');
 
 

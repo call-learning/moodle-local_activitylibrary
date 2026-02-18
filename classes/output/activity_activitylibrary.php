@@ -29,28 +29,22 @@ class activity_activitylibrary extends base_activitylibrary {
     /** @var int[] */
     protected $courseids = [];
 
-    /** @var int */
-    protected $courseid = 0;
-
     /**
      * Main constructor.
      *
      * @param int[] $courseids
-     * @param int $courseid
      * @param string $sort
      * @param string $view
      * @param int $paging
      */
     public function __construct(
         array $courseids = [],
-        int $courseid = 0,
         $sort = self::SORT_FULLNAME_ASC,
         $view = self::VIEW_CARD,
         $paging = self::PAGING_12
     ) {
         parent::__construct($sort, $view, $paging);
         $this->courseids = array_values(array_unique(array_filter(array_map('intval', $courseids))));
-        $this->courseid = (int)$courseid;
     }
 
     /**
@@ -62,9 +56,7 @@ class activity_activitylibrary extends base_activitylibrary {
     public function export_for_template(renderer_base $output) {
         $handler = \local_activitylibrary\customfield\coursemodule_handler::create();
         $defaultvariables = $this->get_export_defaults($output, $handler);
-        // Keep JS compatibility with existing built AMD bundles expecting "course".
         $defaultvariables['entitytype'] = 'course';
-        $defaultvariables['parentid'] = $this->courseid;
         $defaultvariables['courseids'] = implode(',', $this->courseids);
         $defaultvariables['categoryid'] = 0;
         return array_merge($defaultvariables, $this->get_preferences());

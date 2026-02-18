@@ -57,7 +57,6 @@ const createState = () => ({
     eventNamespace: '',
     filterEventNamespace: '',
     currentFilters: [],
-    courseId: 0,
     courseIds: []
 });
 
@@ -96,7 +95,6 @@ const getItemsPerPage = (root) => {
 };
 
 const updateStateContextFromRoot = (root, state) => {
-    state.courseId = parseInt(root.attr('data-parent-id'), 10) || 0;
     state.courseIds = (root.attr('data-course-ids') || '')
         .split(',')
         .map((value) => parseInt(value, 10))
@@ -104,7 +102,6 @@ const updateStateContextFromRoot = (root, state) => {
 };
 
 const fetchEntities = (state, modifiers, limit, offset) => Repository.getFilteredActivitiesList({
-    courseid: state.courseId,
     courseids: state.courseIds,
     sorting: [{column: modifiers.sort.column, order: modifiers.sort.order}],
     filters: state.currentFilters,

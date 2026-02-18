@@ -47,7 +47,6 @@ class get_filtered_activities extends external_api {
     public static function execute_parameters() {
         return new external_function_parameters(
             [
-                'courseid' => new external_value(PARAM_INT, 'Course id', VALUE_DEFAULT, 0),
                 'courseids' => new external_multiple_structure(
                     new external_value(PARAM_INT, 'Course id'),
                     'List of course ids',
@@ -98,7 +97,6 @@ class get_filtered_activities extends external_api {
      * @return array
      */
     public static function execute(
-        int $courseid = 0,
         array $courseids = [],
         array $filters = [],
         int $limit = 0,
@@ -107,21 +105,19 @@ class get_filtered_activities extends external_api {
     ): array {
         global $DB, $PAGE;
 
-        $inparams = compact(['courseid', 'courseids', 'filters', 'limit', 'offset', 'sorting']);
+        $inparams = compact(['courseids', 'filters', 'limit', 'offset', 'sorting']);
         $params = self::validate_parameters(self::execute_parameters(), $inparams);
         $context = context_system::instance();
-        if ($params['courseid'] > 0) {
-            $context = context_course::instance($params['courseid']);
-        }
         self::validate_context($context);
         $scopeids = array_values(array_unique(array_filter(array_map('intval', $params['courseids']))));
-        if ($params['courseid'] > 0) {
-            $scopeids = [$params['courseid']];
+        foreach($scopeids as $courseid) {
+            $coursecontext = context_course::instance($courseid);
+            self::validate_context($coursecontext);
         }
-
         if (empty($scopeids)) {
-            $scopeids = array_map('intval', array_keys($DB->get_records_select_menu('course', 'id <> :siteid',
-                ['siteid' => SITEID], '', 'id, id')));
+            // Get all courses where user is enrolled (can view)
+            $mycourses = enrol_get_my_courses();
+            $scopeids = array_keys($mycourses);
         }
 
         if (empty($scopeids)) {
@@ -130,10 +126,9 @@ class get_filtered_activities extends external_api {
 
         [$insql, $inparams] = $DB->get_in_or_equal($scopeids, SQL_PARAMS_NAMED, 'courseid');
         $sqlparams = $inparams;
-        $sqlwhere = "e.course {$insql} AND m.visible = 1";
+        $sqlwhere = "e.course {$insql} AND e.visible = 1";
 
         $additionalfields = [
-            'fullname' => 'm.name AS fullname',
             'modname' => 'm.name AS modname',
             'parentid' => 'e.course AS parentid',
             'category' => 'c.fullname AS category',
@@ -220,6 +215,13 @@ class get_filtered_activities extends external_api {
                 usort($modulesinfo, function($left, $right) use ($order) {
                     $leftvalue = $left['timemodified'] ?? 0;
                     $rightvalue = $right['timemodified'] ?? 0;
+                    return $order === 'DESC' ? $rightvalue <=> $leftvalue : $leftvalue <=> $rightvalue;
+                });
+            }
+            if ($column === 'fullname') {
+                usort($modulesinfo, function($left, $right) use ($order) {
+                    $leftvalue = $left['fullname'] ?? '';
+                    $rightvalue = $right['fullname'] ?? '';
                     return $order === 'DESC' ? $rightvalue <=> $leftvalue : $leftvalue <=> $rightvalue;
                 });
             }

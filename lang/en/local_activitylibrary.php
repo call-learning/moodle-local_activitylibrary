@@ -40,6 +40,7 @@ $string['enableactivitylibrary'] = 'Enable Activity Library';
 $string['filter:anyvalue'] = 'Any';
 $string['filter:submit'] = 'Filter';
 $string['filters'] = 'Filters';
+$string['fulltext'] = 'Search';
 $string['hiddenfromstudents'] = 'Closed';
 $string['hidefromcatalogue'] = 'Hide from catalogue';
 $string['lastmodification'] = 'Last modification';

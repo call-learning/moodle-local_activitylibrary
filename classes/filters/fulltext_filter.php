@@ -35,6 +35,15 @@ namespace local_activitylibrary\filters;
 class fulltext_filter implements activitylibrary_filter_interface, static_filter_interface {
 
     /**
+     * Get the name of the item that will store the value
+     *
+     * @return string
+     */
+    protected function get_form_value_item_name() {
+        return 'fulltext[value]';
+    }
+
+    /**
      * Add to form
      *
      * @param \MoodleQuickForm $mform
@@ -42,7 +51,8 @@ class fulltext_filter implements activitylibrary_filter_interface, static_filter
      */
     public function add_to_form(\MoodleQuickForm &$mform) {
         $elementname = $this->get_form_value_item_name();
-        $mform->addElement( 'text', 'fulltext', $this->get_label());
+        $mform->addElement('text', 'fulltext', $this->get_label());
+        $mform->setType('fulltext', PARAM_TEXT);
         $mform->setType($elementname, PARAM_TEXT);
         utils::add_filter_operators_to_form($mform,
             'fulltext',

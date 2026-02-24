@@ -47,6 +47,19 @@ class filter_form extends \moodleform {
         $handler = $this->_customdata['handler'];
         $mform->addElement('header', 'miscellaneoussettingshdr', get_string('filters', 'local_activitylibrary'));
         $mform->setAdvanced('miscellaneoussettingshdr');
+
+        // Add static filters (like fulltext search).
+        $staticfilters = [
+            'local_activitylibrary\filters\fulltext_filter',
+        ];
+        foreach ($staticfilters as $filterclass) {
+            if (class_exists($filterclass)) {
+                $filter = new $filterclass();
+                $filter->add_to_form($mform);
+            }
+        }
+
+        // Add custom field filters.
         foreach ($handler->get_fields() as $field) {
             if (!utils::is_field_hidden_filters($handler, $field->get('shortname'))) {
                 $filter = customfield_utils::get_filter_from_field($field);

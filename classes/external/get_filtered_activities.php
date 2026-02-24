@@ -157,12 +157,11 @@ class get_filtered_activities extends external_api {
         $renderer = $PAGE->get_renderer('core');
         $modulesinfo = [];
         $modinfos = [];
-        $courseimages = [];
+        $modhasintro = [];
 
         foreach ($records as $record) {
             if (empty($modinfos[$record->parentid])) {
                 $modinfos[$record->parentid] = get_fast_modinfo($record->parentid);
-                $courseimages[$record->parentid] = $renderer->get_generated_image_for_id($record->parentid);
             }
 
             $context = context_course::instance($record->parentid, IGNORE_MISSING);
@@ -189,7 +188,6 @@ class get_filtered_activities extends external_api {
             $recorddata['groupmode'] = $cm->groupmode;
             $recorddata['groupingid'] = $cm->groupingid;
             $recorddata['visible'] = (int)$cm->uservisible;
-            $recorddata['image'] = $courseimages[$record->parentid];
 
             if ($cm->url) {
                 $recorddata['viewurl'] = $cm->url->out_as_local_url();
@@ -203,7 +201,21 @@ class get_filtered_activities extends external_api {
             }
 
             $recorddata['iconurl'] = $exported['iconurl'] ?? '';
+            $recorddata['purpose'] = plugin_supports('mod', $cm->modname, FEATURE_MOD_PURPOSE, MOD_PURPOSE_OTHER);
             $recorddata['modname'] = $cm->modname;
+
+            if (!array_key_exists($cm->modname, $modhasintro)) {
+                $modhasintro[$cm->modname] = $DB->get_manager()->field_exists($cm->modname, 'intro');
+            }
+            if ($modhasintro[$cm->modname]) {
+                $intro = (string)$DB->get_field($cm->modname, 'intro', ['id' => $cm->instance]);
+                if ($intro !== '') {
+                    $description = preg_replace('/\s+/', ' ', trim(strip_tags($intro)));
+                    if (!empty($description)) {
+                        $recorddata['description'] = $description;
+                    }
+                }
+            }
             $modulesinfo[] = $recorddata;
         }
 
@@ -245,8 +257,9 @@ class get_filtered_activities extends external_api {
                     'idnumber' => new external_value(PARAM_RAW, 'Id number', VALUE_OPTIONAL),
                     'modname' => new external_value(PARAM_RAW, 'Module name'),
                     'iconurl' => new external_value(PARAM_RAW, 'Module icon URL', VALUE_OPTIONAL),
+                    'purpose' => new external_value(PARAM_ALPHANUMEXT, 'Module purpose', VALUE_OPTIONAL),
+                    'description' => new external_value(PARAM_TEXT, 'Module description', VALUE_OPTIONAL),
                     'visible' => new external_value(PARAM_INT, '1 available, 0 unavailable', VALUE_OPTIONAL),
-                    'image' => new external_value(PARAM_RAW, 'Course image'),
                     'groupmode' => new external_value(PARAM_INT, 'Group mode', VALUE_OPTIONAL),
                     'groupingid' => new external_value(PARAM_INT, 'Grouping id', VALUE_OPTIONAL),
                     'timecreated' => new external_value(PARAM_INT, 'Creation time', VALUE_OPTIONAL),

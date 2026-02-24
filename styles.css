@@ -68,7 +68,6 @@
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: .5rem;
     height: 100%;
-    margin-bottom: .5rem;
     overflow: hidden;
     transition: box-shadow 0.2s ease;
 }
@@ -77,46 +76,61 @@
     box-shadow: 0 6px 18px -10px rgba(0, 0, 0, 0.35);
 }
 
-.path-local-activitylibrary .activitylibrary-card-deck .activitylibrary-card .activitylibrary-card-img {
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
+.path-local-activitylibrary .activitylibrary-card-deck .activitylibrary-card .activitylibrary-card-thumbnail {
+    align-items: center;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
-    height: 7rem;
+    display: flex;
+    height: 4.25rem;
+    justify-content: center;
 }
 
-#page-local-activitylibrary-index .activitylibrary-card-deck .activitylibrary-card .activitylibrary-card-img {
-    height: 180px;
+#page-local-activitylibrary-index .activitylibrary-card-deck .activitylibrary-card .activitylibrary-card-thumbnail {
+    height: 5rem;
 }
 
 #page-local-activitylibrary-index .activitylibrary-card-deck .activitylibrary-card .link-go-to-content {
     padding: initial;
 }
 
-.local-activitylibrary .activitylibrary-card-img {
-    background-repeat: no-repeat;
-    background-size: contain;
+.local-activitylibrary .activitylibrary-thumbnail-icon.activityiconcontainer {
+    height: 2.25rem;
+    width: 2.25rem;
+}
+
+.local-activitylibrary .activitylibrary-thumbnail-icon .activityicon {
+    height: 1.1rem;
+    width: 1.1rem;
 }
 
 .local-activitylibrary .card .entityame {
     display: -webkit-box;
-    line-clamp: 3;
+    font-size: .95rem;
+    font-weight: 600;
+    line-clamp: 2;
     overflow: hidden;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
 }
 
-.local-activitylibrary .card-icon {
-    position: absolute;
-    right: 1em;
-    top: 1em;
+.local-activitylibrary .entity-description {
+    display: -webkit-box;
+    font-size: .8rem;
+    line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
 }
 
-.local-activitylibrary img.list-image {
-    border-radius: 20%;
-    height: 4em;
-    width: 4em;
+.local-activitylibrary .entity-listitem .item-name {
+    display: -webkit-box;
+    font-weight: 600;
+    line-clamp: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
 }
 
 /* Filters */

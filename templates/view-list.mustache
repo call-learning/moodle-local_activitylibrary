@@ -36,16 +36,22 @@
 
 <ul class="list-group">
     {{#entities}}
-        <li class="list-group-item entity-listitem"
+        <li class="list-group-item entity-listitem py-2"
             data-region="entity-content"
             data-entity-id="{{{id}}}">
             <div class="row">
                 <div class="col d-flex align-items-center">
-                    <div class="d-flex align-items-center flex-wrap">
-                        <div class="text-muted muted mr-2">
-                        <span class="sr-only">
-                            {{#str}}aria:category, local_activitylibrary{{/str}}
-                        </span>
+                    <div class="d-flex align-items-center w-100">
+                        {{#iconurl}}
+                            <span class="activityiconcontainer smaller me-2 {{purpose}}">
+                                <img class="activityicon" src="{{{iconurl}}}" alt="{{modname}}">
+                            </span>
+                        {{/iconurl}}
+                        <div class="min-w-0 flex-grow-1">
+                            <div class="text-muted muted small mb-0">
+                                <span class="sr-only">
+                                    {{#str}}aria:category, local_activitylibrary{{/str}}
+                                </span>
                             <span class="categoryname">
                                 {{{categoryname}}}
                             </span>
@@ -56,22 +62,20 @@
                                 </span>
                                 <span>{{{shortname}}}</span>
                             {{/showshortname}}
+                            </div>
+                            <span class="sr-only">
+                                {{#str}}aria:fullname, local_activitylibrary{{/str}}
+                            </span>
+                            <div class="item-name mb-0">{{{fullname}}}</div>
+                            {{#description}}
+                                <div class="entity-description text-muted">
+                                    {{description}}
+                                </div>
+                            {{/description}}
+                            {{^visible}}
+                                <span class="tag tag-info ml-2">{{#str}} hiddenfromstudents, local_activitylibrary {{/str}}</span>
+                            {{/visible}}
                         </div>
-                        {{#image}}
-                            <img class="list-image mx-1" src="{{{image}}}" alt="{{#str}}aria:entityimage, local_activitylibrary{{/str}}">
-                        {{/image}}
-                        {{#iconurl}}
-                            <img class="list-icon" src="{{{iconurl}}}" alt="{{#str}}aria:entityimage, local_activitylibrary{{/str}}">
-                        {{/iconurl}}
-                        <span class="sr-only">
-                            {{#str}}aria:fullname, local_activitylibrary{{/str}}
-                        </span>
-                        <span class="item-name">
-                            {{{fullname}}}
-                        </span>
-                        {{^visible}}
-                            <span class="tag tag-info ml-2">{{#str}} hiddenfromstudents, local_activitylibrary {{/str}}</span>
-                        {{/visible}}
                     </div>
                 </div>
                 <div class="col-auto d-flex align-items-center">

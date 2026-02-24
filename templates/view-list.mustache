@@ -39,43 +39,41 @@
         <li class="list-group-item entity-listitem py-2"
             data-region="entity-content"
             data-entity-id="{{{id}}}">
-            <div class="row">
-                <div class="col d-flex align-items-center">
-                    <div class="d-flex align-items-center w-100">
-                        {{#iconurl}}
-                            <span class="activityiconcontainer smaller me-2 {{purpose}}">
-                                <img class="activityicon" src="{{{iconurl}}}" alt="{{modname}}">
-                            </span>
-                        {{/iconurl}}
-                        <div class="min-w-0 flex-grow-1">
-                            <div class="text-muted muted small mb-0">
-                                <span class="sr-only">
-                                    {{#str}}aria:category, local_activitylibrary{{/str}}
-                                </span>
-                            <span class="categoryname">
-                                {{{categoryname}}}
-                            </span>
-                            {{#showshortname}}
-                                <span class="px-1">|</span>
-                                <span class="sr-only">
-                                    {{#str}}aria:shortname, local_activitylibrary{{/str}}
-                                </span>
-                                <span>{{{shortname}}}</span>
-                            {{/showshortname}}
-                            </div>
-                            <span class="sr-only">
-                                {{#str}}aria:fullname, local_activitylibrary{{/str}}
-                            </span>
-                            <div class="item-name mb-0">{{{fullname}}}</div>
-                            {{#description}}
-                                <div class="entity-description text-muted">
-                                    {{description}}
-                                </div>
-                            {{/description}}
-                            {{^visible}}
-                                <span class="tag tag-info ml-2">{{#str}} hiddenfromstudents, local_activitylibrary {{/str}}</span>
-                            {{/visible}}
+            <div class="row align-items-center gx-2">
+                <div class="col-auto">
+                    {{#iconurl}}
+                        <span class="activityiconcontainer smaller {{purpose}}">
+                            <img class="activityicon" src="{{{iconurl}}}" alt="{{modname}}">
+                        </span>
+                    {{/iconurl}}
+                </div>
+                <div class="col min-w-0">
+                    <span class="sr-only">
+                        {{#str}}aria:fullname, local_activitylibrary{{/str}}
+                    </span>
+                    <div class="item-name mb-0">{{{fullname}}}</div>
+                    {{#description}}
+                        <div class="entity-description text-muted">
+                            {{description}}
                         </div>
+                    {{/description}}
+                    {{^visible}}
+                        <span class="tag tag-info ml-2">{{#str}} hiddenfromstudents, local_activitylibrary {{/str}}</span>
+                    {{/visible}}
+                </div>
+                <div class="col-12 col-md-3 col-lg-3 min-w-0 mt-1 mt-md-0">
+                    <div class="list-course-name text-muted small">
+                        <span class="sr-only">
+                            {{#str}}aria:category, local_activitylibrary{{/str}}
+                        </span>
+                        <span class="categoryname">{{{categoryname}}}</span>
+                        {{#showshortname}}
+                            <span class="px-1">|</span>
+                            <span class="sr-only">
+                                {{#str}}aria:shortname, local_activitylibrary{{/str}}
+                            </span>
+                            <span>{{{shortname}}}</span>
+                        {{/showshortname}}
                     </div>
                 </div>
                 <div class="col-auto d-flex align-items-center">

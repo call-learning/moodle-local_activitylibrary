@@ -64,7 +64,7 @@
 }
 
 /* Activity library cards */
-.path-local-activitylibrary .activitylibrary-card-deck .activitylibrary-card {
+.path-local-activitylibrary [data-region="card-deck"] > [data-region="entity-content"] > .card {
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: .5rem;
     height: 100%;
@@ -72,11 +72,11 @@
     transition: box-shadow 0.2s ease;
 }
 
-.path-local-activitylibrary .activitylibrary-card-deck .activitylibrary-card:hover {
+.path-local-activitylibrary [data-region="card-deck"] > [data-region="entity-content"] > .card:hover {
     box-shadow: 0 6px 18px -10px rgba(0, 0, 0, 0.35);
 }
 
-.path-local-activitylibrary .activitylibrary-card-deck .activitylibrary-card .activitylibrary-card-thumbnail {
+.path-local-activitylibrary [data-region="card-deck"] > [data-region="entity-content"] > .card .activitylibrary-card-thumbnail {
     align-items: center;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
@@ -85,11 +85,11 @@
     justify-content: center;
 }
 
-#page-local-activitylibrary-index .activitylibrary-card-deck .activitylibrary-card .activitylibrary-card-thumbnail {
+#page-local-activitylibrary-index [data-region="card-deck"] > [data-region="entity-content"] > .card .activitylibrary-card-thumbnail {
     height: 5rem;
 }
 
-#page-local-activitylibrary-index .activitylibrary-card-deck .activitylibrary-card .link-go-to-content {
+#page-local-activitylibrary-index [data-region="card-deck"] > [data-region="entity-content"] > .card .link-go-to-content {
     padding: initial;
 }
 
@@ -113,6 +113,15 @@
     -webkit-line-clamp: 2;
 }
 
+.local-activitylibrary .card-course-name {
+    display: -webkit-box;
+    line-clamp: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+}
+
 .local-activitylibrary .entity-description {
     display: -webkit-box;
     font-size: .8rem;
@@ -131,6 +140,38 @@
     text-overflow: ellipsis;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 1;
+}
+
+.local-activitylibrary .list-course-name {
+    display: -webkit-box;
+    line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+/* Placeholders */
+.activitylibrary-placeholder-row {
+    height: 13rem;
+}
+
+.activitylibrary-card-placeholder-image {
+    height: 7rem;
+}
+
+.activitylibrary-card-placeholder-line {
+    height: 1rem;
+}
+
+.activitylibrary-list-placeholder-dot {
+    height: 1rem;
+    width: 1rem;
+}
+
+.activitylibrary-list-placeholder-line {
+    height: 1rem;
+    width: 50%;
 }
 
 /* Filters */

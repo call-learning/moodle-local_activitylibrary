@@ -59,12 +59,12 @@ $primary: #00b8de;
         bottom: 0;
         padding: .5rem;
         position: absolute;
-        right: 0; // Fix dashboard card arrow.
+        right: 0; // Fix card action button alignment.
     }
 }
 
-#page-local-activitylibrary-index .dashboard-card-deck .dashboard-card {
-    .dashboard-card-img {
+#page-local-activitylibrary-index .activitylibrary-card-deck .activitylibrary-card {
+    .activitylibrary-card-img {
         height: 180px;
     }
     .link-go-to-content {
@@ -72,7 +72,7 @@ $primary: #00b8de;
     }
 }
 
-.local-activitylibrary .dashboard-card-img {
+.local-activitylibrary .activitylibrary-card-img {
     background-size: contain;
     background-repeat: no-repeat;
 }
@@ -138,9 +138,9 @@ $primary: #00b8de;
     }
 }
 
-.path-local-activitylibrary .dashboard-card-deck .dashboard-card {
+.path-local-activitylibrary .activitylibrary-card-deck .activitylibrary-card {
     margin-bottom: .5rem;
-    .dashboard-card-img {
+    .activitylibrary-card-img {
         height: 7rem;
         background-position: center;
         background-size: cover;

@@ -33,14 +33,14 @@
     }
 }}
 
-<div class="card-deck dashboard-card-deck {{$classes}}{{/classes}}" data-region="card-deck" role="list">
+<div class="row activitylibrary-card-deck {{$classes}}{{/classes}}" data-region="card-deck" role="list">
     {{#entities}}
-        <div class="card dashboard-card col-6 col-md-4 col-lg-3" role="listitem"
+        <div class="card activitylibrary-card col-6 col-md-4 col-lg-3 mb-3" role="listitem"
              data-region="entity-content"
              data-entity-id="{{{id}}}">
             <a href="{{viewurl}}" tabindex="-1">
                 {{#image}}
-                <div class="card-img dashboard-card-img" style='background-image: url("{{{image}}}");'>
+                <div class="card-img activitylibrary-card-img" style='background-image: url("{{{image}}}");'>
                     <span class="sr-only">{{#str}}aria:entityimage, local_activitylibrary{{/str}}</span>
                 </div>
                 {{/image}}

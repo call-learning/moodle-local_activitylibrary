@@ -63,15 +63,15 @@
     outline: initial;
 }
 
-#page-local-activitylibrary-index .dashboard-card-deck .dashboard-card .dashboard-card-img {
+#page-local-activitylibrary-index .activitylibrary-card-deck .activitylibrary-card .activitylibrary-card-img {
     height: 180px;
 }
 
-#page-local-activitylibrary-index .dashboard-card-deck .dashboard-card .link-go-to-content {
+#page-local-activitylibrary-index .activitylibrary-card-deck .activitylibrary-card .link-go-to-content {
     padding: initial;
 }
 
-.local-activitylibrary .dashboard-card-img {
+.local-activitylibrary .activitylibrary-card-img {
     background-size: contain;
     background-repeat: no-repeat;
 }
@@ -138,11 +138,11 @@
     }
 }
 
-.path-local-activitylibrary .dashboard-card-deck .dashboard-card {
+.path-local-activitylibrary .activitylibrary-card-deck .activitylibrary-card {
     margin-bottom: .5rem;
 }
 
-.path-local-activitylibrary .dashboard-card-deck .dashboard-card .dashboard-card-img {
+.path-local-activitylibrary .activitylibrary-card-deck .activitylibrary-card .activitylibrary-card-img {
     height: 7rem;
     background-position: center;
     background-size: cover;

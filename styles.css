@@ -1,8 +1,9 @@
-/* stylelint-disable */
+/* stylelint-disable declaration-no-important */
+
+/* Legacy course card */
 .card-course {
     background: #ffffff;
     box-shadow: 0 2px 14px -4px rgba(0, 0, 0, 0.25);
-    /* stylelint-disable declaration-no-important */
     height: 288px !important;
     position: relative;
 }
@@ -40,8 +41,7 @@
     line-height: 150%;
     max-height: 60px;
     overflow: hidden;
-    padding: 8px;
-    padding-right: 24px;
+    padding: 8px 24px 8px 8px;
     text-align: center;
     text-overflow: ellipsis;
     white-space: normal;
@@ -63,6 +63,29 @@
     outline: initial;
 }
 
+/* Activity library cards */
+.path-local-activitylibrary .activitylibrary-card-deck .activitylibrary-card {
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: .5rem;
+    height: 100%;
+    margin-bottom: .5rem;
+    overflow: hidden;
+    transition: box-shadow 0.2s ease;
+}
+
+.path-local-activitylibrary .activitylibrary-card-deck .activitylibrary-card:hover {
+    box-shadow: 0 6px 18px -10px rgba(0, 0, 0, 0.35);
+}
+
+.path-local-activitylibrary .activitylibrary-card-deck .activitylibrary-card .activitylibrary-card-img {
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    height: 7rem;
+}
+
 #page-local-activitylibrary-index .activitylibrary-card-deck .activitylibrary-card .activitylibrary-card-img {
     height: 180px;
 }
@@ -72,22 +95,31 @@
 }
 
 .local-activitylibrary .activitylibrary-card-img {
-    background-size: contain;
     background-repeat: no-repeat;
+    background-size: contain;
 }
 
-.local-activitylibrary img.list-image {
-    width: 4em;
-    height: 4em;
-    border-radius: 20%;
+.local-activitylibrary .card .entityame {
+    display: -webkit-box;
+    line-clamp: 3;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
 }
 
 .local-activitylibrary .card-icon {
     position: absolute;
-    top: 1em;
     right: 1em;
+    top: 1em;
 }
 
+.local-activitylibrary img.list-image {
+    border-radius: 20%;
+    height: 4em;
+    width: 4em;
+}
+
+/* Filters */
 .activitylibrary-filters-form .fdate_selector {
     flex-wrap: wrap;
 }
@@ -101,19 +133,11 @@
     display: none !important;
 }
 
+/* Icons and actions */
 .activitylibrary-content a.item-view .icon {
     font-size: 40px;
-    width: 40px;
     height: 40px;
-}
-
-.local-activitylibrary .card .entityame {
-    /* Line clamping */
-    display: -webkit-box;
-    line-clamp: 3;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    width: 40px;
 }
 
 [data-action="hidefromcatalogue"],
@@ -136,16 +160,4 @@
     100% {
         transform: scale(1);
     }
-}
-
-.path-local-activitylibrary .activitylibrary-card-deck .activitylibrary-card {
-    margin-bottom: .5rem;
-}
-
-.path-local-activitylibrary .activitylibrary-card-deck .activitylibrary-card .activitylibrary-card-img {
-    height: 7rem;
-    background-position: center;
-    background-size: cover;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
 }

@@ -15,8 +15,8 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 namespace local_activitylibrary\customfield;
 
+use core_customfield\api;
 use core_customfield\handler;
-use local_activitylibrary\common_cf_handler;
 use core_customfield\field_controller;
 use restore_activity_task;
 
@@ -28,8 +28,15 @@ use restore_activity_task;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class coursemodule_handler extends handler {
+    /**
+     * @var coursemodule_handler
+     */
+    protected static $singleton;
 
-    use common_cf_handler;
+    /**
+     * @var \context|null
+     */
+    protected $parentcontext;
 
     /** @var int Field is displayed in the course listing, visible to everybody */
     const VISIBLETOALL = 2;
@@ -37,6 +44,29 @@ class coursemodule_handler extends handler {
     const VISIBLETOTEACHERS = 1;
     /** @var int Field is not displayed in the course listing */
     const NOTVISIBLE = 0;
+
+    /**
+     * Returns a singleton.
+     *
+     * @param int $itemid
+     * @return \core_customfield\handler
+     */
+    public static function create(int $itemid = 0): \core_customfield\handler {
+        if (static::$singleton === null) {
+            static::$singleton = new static(0);
+        }
+        return static::$singleton;
+    }
+
+    /**
+     * Run reset code after unit tests to reset the singleton usage.
+     */
+    public static function reset_caches(): void {
+        if (!PHPUNIT_TEST) {
+            throw new \coding_exception('This feature is only intended for use in unit tests');
+        }
+        static::$singleton = null;
+    }
 
     /**
      * Allows to add custom controls to the field configuration form that will be saved in configdata
@@ -116,6 +146,77 @@ class coursemodule_handler extends handler {
     }
 
     /**
+     * The current user can configure custom fields on this component.
+     *
+     * @return bool true if the current can configure custom fields, false otherwise
+     */
+    public function can_configure(): bool {
+        return has_capability('local/activitylibrary:configurecustomfields', $this->get_configuration_context());
+    }
+
+    /**
+     * The current user can edit custom fields on the given field.
+     *
+     * @param field_controller $field
+     * @param int $instanceid id of the course to test edit permission
+     * @return bool true if the current can edit custom fields, false otherwise
+     */
+    public function can_edit(field_controller $field, int $instanceid = 0): bool {
+        if ($instanceid) {
+            $context = $this->get_instance_context($instanceid);
+            return (!$field->get_configdata_property('locked') ||
+                has_capability('local/activitylibrary:changelockedcustomfields', $context));
+        }
+
+        $context = $this->get_parent_context();
+        return (!$field->get_configdata_property('locked') ||
+            guess_if_creator_will_have_course_capability('local/activitylibrary:changelockedcustomfields', $context));
+    }
+
+    /**
+     * Sets parent context for the module.
+     *
+     * @param \context $context
+     */
+    public function set_parent_context(\context $context) {
+        $this->parentcontext = $context;
+    }
+
+    /**
+     * Context that should be used for new categories created by this handler.
+     *
+     * @return \context the context for configuration
+     */
+    public function get_configuration_context(): \context {
+        return \context_system::instance();
+    }
+
+    /**
+     * Here we don't use categories.
+     *
+     * @return bool
+     */
+    public function uses_categories(): bool {
+        return false;
+    }
+
+    /**
+     * The current user can view custom fields.
+     *
+     * @param field_controller $field
+     * @param int $instanceid id of the course to test view permission
+     * @return bool true if the current can view custom fields, false otherwise
+     * @throws \coding_exception
+     */
+    public function can_view(field_controller $field, int $instanceid): bool {
+        global $USER;
+        $visibility = $field->get_configdata_property('visibility');
+
+        return ($visibility == self::NOTVISIBLE && is_primary_admin($USER->id)) ||
+            has_capability('local/activitylibrary:view', $this->get_instance_context($instanceid));
+    }
+
+    /**
      * Returns the parent context for the course
      *
      * @return \context
@@ -148,5 +249,22 @@ class coursemodule_handler extends handler {
      */
     public function setup_edit_page(field_controller $field): string {
         return $this->setup_edit_page_with_external($field, 'activitylibrary_coursemodule_customfield');
+    }
+
+    /**
+     * Set up page customfield/edit.php.
+     *
+     * @param field_controller $field
+     * @param string $externalpagename
+     * @return string page heading
+     */
+    protected function setup_edit_page_with_external(field_controller $field, $externalpagename): string {
+        global $CFG, $PAGE;
+        require_once($CFG->libdir.'/adminlib.php');
+
+        $title = parent::setup_edit_page($field);
+        admin_externalpage_setup($externalpagename);
+        $PAGE->navbar->add($title);
+        return $title;
     }
 }

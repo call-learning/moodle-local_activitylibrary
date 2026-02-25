@@ -192,12 +192,12 @@ class coursemodule_handler extends handler {
     }
 
     /**
-     * Here we don't use categories.
+     * Activity custom fields use categories in the management UI.
      *
      * @return bool
      */
     public function uses_categories(): bool {
-        return false;
+        return true;
     }
 
     /**

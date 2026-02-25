@@ -24,17 +24,16 @@
 
 
 require_once('../../config.php');
-global $CFG, $PAGE;
+global $CFG, $PAGE, $OUTPUT;
 require_once($CFG->libdir.'/adminlib.php');
-
 admin_externalpage_setup('activitylibrary_customfield');
 
 $output = $PAGE->get_renderer('local_activitylibrary');
 $handler = \local_activitylibrary\customfield\coursemodule_handler::create();
 $outputpage = new \local_activitylibrary\output\customfield_management($handler);
 
-echo $output->header(),
-$output->heading(new lang_string('activitylibrary_customfield', 'local_activitylibrary')),
+echo $OUTPUT->header(),
+$OUTPUT->heading(new lang_string('activitylibrary_customfield', 'local_activitylibrary')),
 $output->render($outputpage),
-$output->footer();
+$OUTPUT->footer();
 

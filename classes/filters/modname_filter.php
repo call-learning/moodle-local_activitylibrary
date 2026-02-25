@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Simple text filter. A variant of the simpletext_filter
+ * Module name static filter.
  *
  * @package   local_activitylibrary
  * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
@@ -25,74 +25,71 @@
 namespace local_activitylibrary\filters;
 
 /**
- * Generic fulltext filter for any entity.
- *
- * This is a "static" filter to be able to search through the entity text fields.
+ * Generic module type filter.
  *
  * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class fulltext_filter implements activitylibrary_filter_interface, static_filter_interface {
-
+class modname_filter implements activitylibrary_filter_interface, static_filter_interface {
     /**
-     * Get the name of the item that will store the value
-     *
-     * @return string
-     */
-    protected function get_form_value_item_name() {
-        return 'fulltext[value]';
-    }
-
-    /**
-     * Add to form
+     * Add to form.
      *
      * @param \MoodleQuickForm $mform
      * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function add_to_form(\MoodleQuickForm &$mform) {
-        $elementname = $this->get_form_value_item_name();
-        utils::add_filter_operators_to_form($mform,
-            'fulltext',
-            'fulltext',
-            self::OPERATOR_EQUAL);
-        $mform->addElement('text', $elementname, $this->get_label());
-        $mform->setType($elementname, PARAM_TEXT);
+        global $DB;
+
+        $choices = ['' => get_string('filter:anyvalue', 'local_activitylibrary')];
+        $stringmanager = get_string_manager();
+        $modulenames = $DB->get_fieldset_select('modules', 'name', '', null, 'name ASC');
+        foreach ($modulenames as $modname) {
+            $component = 'mod_' . $modname;
+            $label = $stringmanager->string_exists('modulename', $component)
+                ? get_string('modulename', $component)
+                : $modname;
+            $choices[$modname] = $label;
+        }
+
+        utils::add_filter_operators_to_form($mform, 'modname', 'modname', self::OPERATOR_EQUAL);
+        $elementname = 'modname[value]';
+        $mform->addElement('select', $elementname, $this->get_label(), $choices);
+        $mform->setType($elementname, PARAM_ALPHANUMEXT);
     }
 
     /**
-     * Check data
+     * Check data.
      *
      * @param \stdClass $formdata
-     * @return false|mixed|string[]
+     * @return false|array
      */
     public function check_data($formdata) {
-        $field = 'fulltext';
-        if (array_key_exists($field, (array)$formdata) && !empty($formdata->$field['value'])) {
-            return ['value' => (string)$formdata->$field['value']];
+        $field = 'modname';
+        if (array_key_exists($field, (array)$formdata) && $formdata->$field !== '') {
+            return ['value' => (string)$formdata->$field];
         }
         return false;
     }
 
     /**
-     * Get label
+     * Get label.
      *
      * @return \lang_string|string
      * @throws \coding_exception
      */
     public function get_label() {
-        return get_string('fulltext', 'local_activitylibrary');
+        return get_string('filter:modname', 'local_activitylibrary');
     }
 
     /**
-     * Get sql filter
+     * Get sql filter.
      *
-     * @param array $data
-     * @return array|null[]
+     * @param array|string $data
+     * @return array
      */
     public function get_sql_filter($data) {
-        global $DB;
-        return empty($data) ? [null, null] : [
-            $DB->sql_like('fullname', ":fulltext", false),
-            ['fulltext' => "%$data%"], ];
+        $modname = clean_param((string)$data, PARAM_ALPHANUMEXT);
+        return $modname !== '' ? ['m.name = :filtermodname', ['filtermodname' => $modname]] : [null, null];
     }
 }

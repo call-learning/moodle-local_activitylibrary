@@ -124,9 +124,48 @@ class get_filtered_activities extends external_api {
             return [];
         }
 
+        $customfieldfilters = [];
+        $selectedcourseids = [];
+        $selectedmodules = [];
+        $fulltext = '';
+        foreach ($params['filters'] as $filter) {
+            $type = $filter['type'] ?? '';
+            $rawvalue = trim((string)($filter['value'] ?? ''));
+            if ($rawvalue === '') {
+                continue;
+            }
+            if ($type === 'course') {
+                $selectedcourseids[] = (int)$rawvalue;
+                continue;
+            }
+            if ($type === 'modname') {
+                $selectedmodules[] = clean_param($rawvalue, PARAM_ALPHANUMEXT);
+                continue;
+            }
+            if ($type === 'fulltext') {
+                $fulltext = clean_param($rawvalue, PARAM_TEXT);
+                continue;
+            }
+            $customfieldfilters[] = $filter;
+        }
+
+        if (!empty($selectedcourseids)) {
+            $scopeids = array_values(array_intersect($scopeids, array_unique(array_filter($selectedcourseids))));
+            if (empty($scopeids)) {
+                return [];
+            }
+        }
+
         [$insql, $inparams] = $DB->get_in_or_equal($scopeids, SQL_PARAMS_NAMED, 'courseid');
         $sqlparams = $inparams;
         $sqlwhere = "e.course {$insql} AND e.visible = 1";
+
+        $selectedmodules = array_values(array_unique(array_filter($selectedmodules)));
+        if (!empty($selectedmodules)) {
+            [$modinsql, $modinparams] = $DB->get_in_or_equal($selectedmodules, SQL_PARAMS_NAMED, 'modname');
+            $sqlwhere .= " AND m.name {$modinsql}";
+            $sqlparams += $modinparams;
+        }
 
         $additionalfields = [
             'modname' => 'm.name AS modname',
@@ -141,7 +180,7 @@ class get_filtered_activities extends external_api {
         $handler = \local_activitylibrary\customfield\coursemodule_handler::create();
         $records = customfield_utils::get_records_from_handler(
             $handler,
-            $params['filters'],
+            $customfieldfilters,
             0,
             0,
             [
@@ -177,6 +216,9 @@ class get_filtered_activities extends external_api {
 
             $cm = $modinfos[$record->parentid]->get_cm($record->id);
             if (!$cm->uservisible) {
+                continue;
+            }
+            if ($fulltext !== '' && stripos($cm->name, $fulltext) === false) {
                 continue;
             }
 

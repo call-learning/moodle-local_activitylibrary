@@ -51,6 +51,8 @@ class filter_form extends \moodleform {
         // Add static filters (like fulltext search).
         $staticfilters = [
             'local_activitylibrary\filters\fulltext_filter',
+            'local_activitylibrary\filters\course_filter',
+            'local_activitylibrary\filters\modname_filter',
         ];
         foreach ($staticfilters as $filterclass) {
             if (class_exists($filterclass)) {
@@ -87,6 +89,24 @@ class filter_form extends \moodleform {
         $submission = $_GET;
         merge_query_params($submission, $_POST);
         $prefilters = [];
+
+        foreach (['course', 'modname', 'fulltext'] as $staticfiltername) {
+            if (!empty($submission[$staticfiltername]) && is_array($submission[$staticfiltername])) {
+                $prefilters[$staticfiltername]['operator'] = clean_param(
+                    $submission[$staticfiltername]['operator'] ?? activitylibrary_filter_interface::OPERATOR_EQUAL,
+                    PARAM_INT
+                );
+                $prefilters[$staticfiltername]['type'] = clean_param(
+                    $submission[$staticfiltername]['type'] ?? $staticfiltername,
+                    PARAM_ALPHANUMEXT
+                );
+                $prefilters[$staticfiltername]['value'] = clean_param(
+                    $submission[$staticfiltername]['value'] ?? '',
+                    $staticfiltername === 'course' ? PARAM_INT :
+                        ($staticfiltername === 'fulltext' ? PARAM_TEXT : PARAM_ALPHANUMEXT)
+                );
+            }
+        }
 
         // Filter out non relevant values.
         $handler = $this->_customdata['handler'];

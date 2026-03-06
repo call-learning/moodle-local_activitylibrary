@@ -33,7 +33,6 @@ namespace local_activitylibrary\local\filters;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class fulltext_filter implements activitylibrary_filter_interface, static_filter_interface {
-
     /**
      * Get the name of the item that will store the value
      *
@@ -51,10 +50,12 @@ class fulltext_filter implements activitylibrary_filter_interface, static_filter
      */
     public function add_to_form(\MoodleQuickForm &$mform) {
         $elementname = $this->get_form_value_item_name();
-        utils::add_filter_operators_to_form($mform,
+        utils::add_filter_operators_to_form(
+            $mform,
             'fulltext',
             'fulltext',
-            self::OPERATOR_EQUAL);
+            self::OPERATOR_EQUAL
+        );
         $mform->addElement('text', $elementname, $this->get_label());
         $mform->setType($elementname, PARAM_TEXT);
     }

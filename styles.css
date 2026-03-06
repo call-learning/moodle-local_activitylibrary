@@ -2,7 +2,7 @@
 
 /* Legacy course card */
 .card-course {
-    background: #ffffff;
+    background: #fff;
     box-shadow: 0 2px 14px -4px rgba(0, 0, 0, 0.25);
     height: 288px !important;
     position: relative;
@@ -92,6 +92,7 @@
     justify-content: center;
 }
 
+/* stylelint-disable-next-line max-line-length */
 #page-local-activitylibrary-index [data-region="card-deck"] > [data-region="entity-content"] > .card .activitylibrary-card-thumbnail {
     height: 5rem;
 }

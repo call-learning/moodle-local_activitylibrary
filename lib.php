@@ -23,8 +23,8 @@
  */
 
 
-define("LOCAL_activitylibrary_ITEM_VISIBLE", 0);
-define("LOCAL_activitylibrary_ITEM_HIDDEN", 1);
+define("LOCAL_ACTIVITYLIBRARY_ITEM_VISIBLE", 0);
+define("LOCAL_ACTIVITYLIBRARY_ITEM_HIDDEN", 1);
 
 
 
@@ -58,11 +58,17 @@ function local_activitylibrary_extend_navigation(global_navigation $nav) {
     if ($nav->find('activitylibrary', null)) {
         return;
     }
-    list($urltext, $url) = \local_activitylibrary\local\utils::get_catalog_url();
+    [$urltext, $url] = \local_activitylibrary\local\utils::get_catalog_url();
     $mycoursesnode = $nav->find('mycourses', null);
     if ($mycoursesnode) {
-        $node = $nav->create($urltext, $url, navigation_node::NODETYPE_LEAF, null, 'activitylibrary',
-            new pix_icon('i/course', 'activitylibrary'));
+        $node = $nav->create(
+            $urltext,
+            $url,
+            navigation_node::NODETYPE_LEAF,
+            null,
+            'activitylibrary',
+            new pix_icon('i/course', 'activitylibrary')
+        );
         $node->showinflatnavigation = true;
         $nav->add_node($node, 'mycourses');
     }
@@ -137,7 +143,7 @@ function local_activitylibrary_coursemodule_standard_elements($formwrapper, $mfo
         // Here we have two different objects: $currentmodule is an instance of a coursemodule
         // The other (coursemoduledata) is the data to be presented to the form.
         // We need a mix between them so we set the form data the right way.
-        list($cm, $context, $module, $coursemoduledata, $cw) = get_moduleinfo_data($currentmodule, $course);
+        [$cm, $context, $module, $coursemoduledata, $cw] = get_moduleinfo_data($currentmodule, $course);
         // Copy custom field data onto the form data.
         foreach ($currentmodule as $fieldname => $value) {
             if (strpos($fieldname, 'customfield_') !== false) {
@@ -179,8 +185,10 @@ function local_activitylibrary_coursemodule_edit_post_actions($data, $course) {
  */
 function local_activitylibrary_coursemodule_validation($mform, $data) {
     global $CFG;
-    if (empty($data['id'])
-        || empty($CFG->enableactivitylibrary)) {
+    if (
+        empty($data['id'])
+        || empty($CFG->enableactivitylibrary)
+    ) {
         return [];
     }
     $handler = \local_activitylibrary\customfield\coursemodule_handler::create($data['id']);

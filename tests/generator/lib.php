@@ -160,8 +160,10 @@ class local_activitylibrary_generator extends component_generator_base {
         $instanceid = $fielddata['instanceid'];
         $value = $fielddata['value'];
         $field = core_customfield\field_controller::create($fieldid);
-        if (local_activitylibrary\local\utils::is_multiselect_installed()
-            && $field instanceof \customfield_multiselect\field_controller) {
+        if (
+            local_activitylibrary\local\utils::is_multiselect_installed()
+            && $field instanceof \customfield_multiselect\field_controller
+        ) {
             $value = explode(',', $value);
         }
         if ($field instanceof customfield_textarea\field_controller) {

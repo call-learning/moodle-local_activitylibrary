@@ -13,6 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
 namespace local_activitylibrary\customfield;
 
 use core_customfield\api;
@@ -75,15 +76,19 @@ class coursemodule_handler extends handler {
      * @throws \coding_exception
      */
     public function config_form_definition(\MoodleQuickForm $mform) {
-        $mform->addElement('header',
+        $mform->addElement(
+            'header',
             'activitylibrary_coursemodule_handler_header',
-            get_string('activitylibraryfieldsettings', 'local_activitylibrary'));
+            get_string('activitylibraryfieldsettings', 'local_activitylibrary')
+        );
         $mform->setExpanded('activitylibrary_coursemodule_handler_header', true);
 
         // If field is locked.
-        $mform->addElement('selectyesno',
+        $mform->addElement(
+            'selectyesno',
             'configdata[locked]',
-            get_string('activitylibraryfield_islocked', 'local_activitylibrary'));
+            get_string('activitylibraryfield_islocked', 'local_activitylibrary')
+        );
         $mform->addHelpButton('configdata[locked]', 'activitylibraryfield_islocked', 'local_activitylibrary');
 
         // Field data visibility.
@@ -93,12 +98,17 @@ class coursemodule_handler extends handler {
                 get_string('activitylibraryfield_visibletoteachers', 'local_activitylibrary'),
             self::NOTVISIBLE =>
                 get_string('activitylibraryfield_notvisible', 'local_activitylibrary'), ];
-        $mform->addElement('select',
+        $mform->addElement(
+            'select',
             'configdata[visibility]',
             get_string('activitylibraryfield_visibility', 'local_activitylibrary'),
-            $visibilityoptions);
+            $visibilityoptions
+        );
         $mform->addHelpButton(
-            'configdata[visibility]', 'activitylibraryfield_visibility', 'local_activitylibrary');
+            'configdata[visibility]',
+            'activitylibraryfield_visibility',
+            'local_activitylibrary'
+        );
     }
 
     /**
@@ -260,7 +270,7 @@ class coursemodule_handler extends handler {
      */
     protected function setup_edit_page_with_external(field_controller $field, $externalpagename): string {
         global $CFG, $PAGE;
-        require_once($CFG->libdir.'/adminlib.php');
+        require_once($CFG->libdir . '/adminlib.php');
 
         $title = parent::setup_edit_page($field);
         admin_externalpage_setup($externalpagename);

@@ -37,7 +37,6 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class behat_local_activitylibrary extends behat_base {
-
     /**
      * Skip tagged scenarios when the multiselect customfield plugin is unavailable.
      *
@@ -114,5 +113,4 @@ class behat_local_activitylibrary extends behat_base {
     public function i_show_fields_filter(string $shortname) {
         $this->i_set_hidden_filter_of_field_to($shortname, '0');
     }
-
 }

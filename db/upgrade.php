@@ -35,6 +35,6 @@ function xmldb_local_activitylibrary_upgrade($oldversion) {
     global $DB;
 
     $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
-    
+
     return true;
 }

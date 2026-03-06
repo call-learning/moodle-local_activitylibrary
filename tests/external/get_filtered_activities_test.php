@@ -349,5 +349,4 @@ final class get_filtered_activities_test extends testcase {
             'multiselect f4' => ['f4', [1, 2], [3], '2'],
         ];
     }
-
 }

@@ -35,7 +35,6 @@ use local_activitylibrary\test\testcase;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class filters_test extends testcase {
-
     /**
      * Test that we can obtain a single row result for a set of fields for a module.
      * @covers \local_activitylibrary\local\customfield_utils::get_sql_for_entity_customfields

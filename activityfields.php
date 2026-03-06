@@ -25,7 +25,7 @@
 
 require_once('../../config.php');
 global $CFG, $PAGE, $OUTPUT;
-require_once($CFG->libdir.'/adminlib.php');
+require_once($CFG->libdir . '/adminlib.php');
 admin_externalpage_setup('activitylibrary_customfield');
 
 $output = $PAGE->get_renderer('local_activitylibrary');
@@ -36,4 +36,3 @@ echo $OUTPUT->header(),
 $OUTPUT->heading(new lang_string('activitylibrary_customfield', 'local_activitylibrary')),
 $output->render($outputpage),
 $OUTPUT->footer();
-

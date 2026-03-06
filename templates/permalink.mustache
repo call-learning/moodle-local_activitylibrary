@@ -31,11 +31,11 @@
             {{#pix}}fp/link_sm, theme, {{#str}}permalink:copy, local_activitylibrary{{/str}}{{/pix}}
         </button>
         </div>
-        <input id="activitylibrary_permalink-i-{{uniqid}}" type="textarea" readonly value="{{url}}" class="form-control form-control-sm">
+        <input id="activitylibrary_permalink-i-{{uniqid}}" type="text" readonly value="{{url}}" class="form-control form-control-sm">
     </div>
 </div>
 {{#js}}
     require(['local_activitylibrary/permalink'], function(Permalink) {
-    Permalink.setupCopyLink('activitylibrary_permalink-t-{{uniqid}}','activitylibrary_permalink-i-{{uniqid}}');
+    Permalink.setupCopyLink('activitylibrary_permalink-t-{{uniqid}}', 'activitylibrary_permalink-i-{{uniqid}}');
     });
 {{/js}}

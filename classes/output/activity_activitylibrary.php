@@ -41,7 +41,7 @@ class activity_activitylibrary extends base_activitylibrary {
         array $courseids = [],
         $sort = self::SORT_FULLNAME_ASC,
         $view = self::VIEW_CARD,
-        $paging = self::PAGING_12
+        $paging = self::PAGING_15
     ) {
         parent::__construct($sort, $view, $paging);
         $this->courseids = array_values(array_unique(array_filter(array_map('intval', $courseids))));

@@ -37,7 +37,7 @@ const TEMPLATES = {
     EMPTY: 'local_activitylibrary/no-entities'
 };
 
-const ITEMS_PER_PAGE_OPTIONS = [12, 24, 48];
+const ITEMS_PER_PAGE_OPTIONS = [15, 25, 50];
 const FILTER_EVENTS = 'activitylibrary-filters-inited activitylibrary-filters-change';
 
 const DEFAULT_PAGED_CONTENT_CONFIG = {

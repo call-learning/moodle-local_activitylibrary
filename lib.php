@@ -94,12 +94,12 @@ function local_activitylibrary_user_preferences() {
 
     $preferences['local_activitylibrary_user_paging_preference'] = [
         'null' => NULL_NOT_ALLOWED,
-        'default' => local_activitylibrary\output\base_activitylibrary::PAGING_12,
+        'default' => local_activitylibrary\output\base_activitylibrary::PAGING_15,
         'type' => PARAM_INT,
         'choices' => [
-            local_activitylibrary\output\base_activitylibrary::PAGING_12,
-            local_activitylibrary\output\base_activitylibrary::PAGING_24,
-            local_activitylibrary\output\base_activitylibrary::PAGING_48,
+            local_activitylibrary\output\base_activitylibrary::PAGING_15,
+            local_activitylibrary\output\base_activitylibrary::PAGING_25,
+            local_activitylibrary\output\base_activitylibrary::PAGING_50,
         ],
     ];
 

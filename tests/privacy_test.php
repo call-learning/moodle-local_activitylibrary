@@ -95,7 +95,7 @@ final class privacy_test extends \core_privacy\tests\provider_testcase {
             ['local_activitylibrary_user_sort_preference', 'title', ''],
             ['local_activitylibrary_user_view_preference', 'card', ''],
             ['local_activitylibrary_user_view_preference', 'list', ''],
-            ['local_activitylibrary_user_paging_preference', 12, 12],
+            ['local_activitylibrary_user_paging_preference', 15, 15],
         ];
     }
 }

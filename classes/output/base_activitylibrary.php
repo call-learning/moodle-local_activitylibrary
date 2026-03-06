@@ -52,12 +52,12 @@ abstract class base_activitylibrary implements renderable, templatable {
     /**
      * Constants for the user paging preferences
      */
-    /** @var int  12 items per page. */
-    const PAGING_12 = 12;
-    /** @var int  24 items per page. */
-    const PAGING_24 = 24;
-    /** @var int  48 items per page. */
-    const PAGING_48 = 48;
+    /** @var int  15 items per page. */
+    const PAGING_15 = 15;
+    /** @var int  25 items per page. */
+    const PAGING_25 = 25;
+    /** @var int  50 items per page. */
+    const PAGING_50 = 50;
 
     /**
      * Constants for the admin category display setting
@@ -122,7 +122,7 @@ abstract class base_activitylibrary implements renderable, templatable {
     public function __construct(
         $sort = self::SORT_FULLNAME_ASC,
         $view = self::VIEW_CARD,
-        $paging = self::PAGING_12) {
+        $paging = self::PAGING_15) {
 
         list($this->sortcolumn, $this->sortorder) = explode(',', $sort);
         $this->view = $view;

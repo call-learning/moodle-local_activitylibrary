@@ -67,11 +67,11 @@ final class lib_test extends local_activitylibrary_testcase {
         );
 
         $this->assertEquals(
-            base_activitylibrary::PAGING_12,
+            base_activitylibrary::PAGING_15,
             $preferences['local_activitylibrary_user_paging_preference']['default']
         );
         $this->assertEquals(
-            [base_activitylibrary::PAGING_12, base_activitylibrary::PAGING_24, base_activitylibrary::PAGING_48],
+            [base_activitylibrary::PAGING_15, base_activitylibrary::PAGING_25, base_activitylibrary::PAGING_50],
             $preferences['local_activitylibrary_user_paging_preference']['choices']
         );
     }

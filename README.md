@@ -1,41 +1,41 @@
 Activity Library Local plugin
 =============================
 
-[![Build Status](https://travis-ci.org/call-learning/moodle-local_activitylibrary.svg?branch=master)](https://travis-ci.org/call-learning/moodle-local_activitylibrary)
+[![Build Status](https://travis-ci.org/call-learning/moodle-local_activitylibrary.svg?branch=main)](https://travis-ci.org/call-learning/moodle-local_activitylibrary)
 
-This plugin adds new customs fields (using the new customfield API in Moodle 3.7) to Courses and Activities so they can be searched and classified.
-The customfields are then used to filter courses and activities on a catalog page.
+This plugin adds new custom fields (using the customfield API introduced in Moodle 3.7) to courses and activities so they can be searched and classified.
+These custom fields are then used to filter courses and activities on a catalog page.
 
-The plugin has been developed for Institut Mines Telecom for its ([Pedagothèque Numérique](https://www.imt.fr/formation/academie-transformations-educatives/ressources-pedagogiques/pedagotheque-numerique/)),
+The plugin was developed for Institut Mines Telecom and its [Pedagothèque Numérique](https://www.imt.fr/formation/academie-transformations-educatives/ressources-pedagogiques/pedagotheque-numerique/),
 a course, teaching and learning activities catalog.
 
 Installation
 ============
 
-Add plugin code into the moodle local folder and run an update/upgrade.  You should now see a new plugin and new menus under the Administration > Courses menu.
+Add the plugin code to Moodle's `local` folder and run the update/upgrade process. You should then see a new plugin and new menus under `Administration > Courses`.
 
 Usage
 =====
 
-The plugin will add a menu under Administration > Courses menu, so a new type of custom fields for activities can be added:
+The plugin adds a menu under `Administration > Courses`, where you can add a new type of custom field for activities:
 * custom fields for activities
 
-Those custom fields will then be taken into account in the activity library page and each field will have its related search form entry.
+Those custom fields are then used on the activity library page, and each field gets a corresponding search form input.
 
 The plugin will also add a new navigation menu called "Resources Library" that will list
-all available courses. If you need to make this page accessible through non logged in users, make sure
-you set the "autologin" to on in the Administration > Site administration > Users > Permissions > User policies 
-(See [Auto Login Guest](https://docs.moodle.org/39/en/Guest_access)). If not a login prompt will appear to see the page.
+all available courses. If you need to make this page accessible to non-logged-in users, make sure
+you set "autologin" to on in `Administration > Site administration > Users > Permissions > User policies`
+(see [Auto Login Guest](https://docs.moodle.org/39/en/Guest_access)). Otherwise, a login prompt will appear before viewing the page.
 
-If you need to hide courses regardless of the course visibility status, you can do so by adding the course ids 
-in the 'hiddencoursesid' settings. The course will not appear in the activity library.
+If you need to hide courses regardless of course visibility status, you can do so by adding course IDs
+to the `hiddencoursesid` setting. Those courses will not appear in the activity library.
 
-This is a temporary solution while looking at more generic solution such as hiding a course per category, tag or other.
+This is a temporary solution while a more generic one is explored, such as hiding courses by category, tag, or other criteria.
  
 Authors
 =======
 Project initiated and produced by DP Pole IRM - Institut Mines-Télécom.
-Realised by Laurent David - SAS CALL Learning
+Implemented by Laurent David - SAS CALL Learning
 
 TODO
 ====

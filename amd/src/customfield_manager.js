@@ -20,7 +20,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import $ from 'jquery';
 import Ajax from 'core/ajax';
 import Notification from 'core/notification';
 
@@ -36,20 +35,21 @@ export default class CustomFieldManager {
      * @param {string} hideFilterLocator
      */
     static init(component, area, hideFilterLocator) {
-        $(hideFilterLocator).on('click', function() {
-            const checked = $(this).is(':checked');
-            const request = {
-                methodname: checked
-                    ? 'local_activitylibrary_hide_fields_filters'
-                    : 'local_activitylibrary_show_fields_filters',
-                args: {
-                    component,
-                    area,
-                    fieldshortnames: [$(this).data('field-shortname')]
-                }
-            };
+        document.querySelectorAll(hideFilterLocator).forEach((element) => {
+            element.addEventListener('click', () => {
+                const request = {
+                    methodname: element.checked
+                        ? 'local_activitylibrary_hide_fields_filters'
+                        : 'local_activitylibrary_show_fields_filters',
+                    args: {
+                        component,
+                        area,
+                        fieldshortnames: [element.dataset.fieldShortname]
+                    }
+                };
 
-            Ajax.call([request])[0].fail(Notification.exception);
+                Ajax.call([request])[0].fail(Notification.exception);
+            });
         });
     }
 }

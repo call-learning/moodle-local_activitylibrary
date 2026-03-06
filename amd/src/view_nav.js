@@ -21,8 +21,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import $ from 'jquery';
-import CustomEvents from 'core/custom_interaction_events';
 import Repository from 'local_activitylibrary/repository';
 import View from 'local_activitylibrary/view';
 import Selectors from 'local_activitylibrary/selectors';
@@ -38,7 +36,19 @@ const PREFERENCE_KEYS = {
     sort: 'local_activitylibrary_user_sort_preference'
 };
 
-const asRoot = (root) => $(root);
+const BINDINGS = new WeakMap();
+
+const asRootElement = (root) => {
+    if (root instanceof Element) {
+        return root;
+    }
+
+    if (root && typeof root.get === 'function') {
+        return root.get(0);
+    }
+
+    return root;
+};
 
 const updatePreference = (type, value) => {
     const preferenceKey = PREFERENCE_KEYS[type];
@@ -52,60 +62,79 @@ const updatePreference = (type, value) => {
 };
 
 const updateSort = (root, option) => {
-    const sortOrder = option.attr('data-sort');
-    const sortColumn = option.attr('data-column');
-    const viewRegion = root.find(Selectors.entityView.region);
+    const sortOrder = option.getAttribute('data-sort');
+    const sortColumn = option.getAttribute('data-column');
+    const viewRegion = root.querySelector(Selectors.entityView.region);
+    if (!viewRegion) {
+        return;
+    }
 
-    viewRegion.attr('data-sort-column', sortColumn);
-    viewRegion.attr('data-sort-order', sortOrder);
+    viewRegion.setAttribute('data-sort-column', sortColumn);
+    viewRegion.setAttribute('data-sort-order', sortOrder);
 
     updatePreference('sort', sortColumn + ',' + sortOrder);
     View.refresh(root);
 };
 
 const updateDisplay = (root, option) => {
-    const displayMode = option.attr('data-display-option');
-    const viewRegion = root.find(Selectors.entityView.region);
+    const displayMode = option.getAttribute('data-display-option');
+    const viewRegion = root.querySelector(Selectors.entityView.region);
+    if (!viewRegion) {
+        return;
+    }
 
-    viewRegion.attr('data-display', displayMode);
+    viewRegion.setAttribute('data-display', displayMode);
 
     updatePreference('display', displayMode);
     View.reset(root);
 };
 
 const bindModifierEvents = (root) => {
-    const modifiers = root.find(SELECTORS.MODIFIERS);
-    const eventNamespace = '.activitylibrarynav_' + (root.attr('id') || 'root');
+    const modifiers = root.querySelector(SELECTORS.MODIFIERS);
+    if (!modifiers) {
+        return;
+    }
 
-    CustomEvents.define(modifiers, [CustomEvents.events.activate]);
+    const previousController = BINDINGS.get(modifiers);
+    if (previousController) {
+        previousController.abort();
+    }
 
-    modifiers.off(CustomEvents.events.activate + eventNamespace)
-        .on(
-            CustomEvents.events.activate + eventNamespace,
-            SELECTORS.SORT_OPTION,
-            (e, data) => {
-                const option = $(e.target);
-                if (option.hasClass('active')) {
-                    return;
-                }
+    const controller = new AbortController();
+    BINDINGS.set(modifiers, controller);
 
-                updateSort(root, option);
-                data.originalEvent.preventDefault();
-            }
-        )
-        .on(
-            CustomEvents.events.activate + eventNamespace,
-            SELECTORS.DISPLAY_OPTION,
-            (e, data) => {
-                const option = $(e.target);
-                if (option.hasClass('active')) {
-                    return;
-                }
+    const getOption = (event) => event.target.closest(SELECTORS.SORT_OPTION + ',' + SELECTORS.DISPLAY_OPTION);
 
-                updateDisplay(root, option);
-                data.originalEvent.preventDefault();
-            }
-        );
+    const handleActivation = (event, fromKeyboard = false) => {
+        const option = getOption(event);
+        if (!option || !modifiers.contains(option)) {
+            return;
+        }
+
+        if (option.classList.contains('active')) {
+            return;
+        }
+
+        if (option.matches(SELECTORS.SORT_OPTION)) {
+            updateSort(root, option);
+        } else if (option.matches(SELECTORS.DISPLAY_OPTION)) {
+            updateDisplay(root, option);
+        }
+
+        if (fromKeyboard || event.type === 'click') {
+            event.preventDefault();
+        }
+    };
+
+    modifiers.addEventListener('click', (event) => {
+        handleActivation(event);
+    }, {signal: controller.signal});
+
+    modifiers.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ' || event.key === 'Spacebar') {
+            handleActivation(event, true);
+        }
+    }, {signal: controller.signal});
 };
 
 /**
@@ -118,6 +147,10 @@ export default class ViewNav {
      * @param {object} root
      */
     static init(root) {
-        bindModifierEvents(asRoot(root));
+        const rootElement = asRootElement(root);
+        if (!rootElement) {
+            return;
+        }
+        bindModifierEvents(rootElement);
     }
 }

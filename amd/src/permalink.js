@@ -20,13 +20,27 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import $ from 'jquery';
 import Templates from 'core/templates';
 import Toast from 'core/toast';
 import Str from 'core/str';
 import Notification from 'core/notification';
 
 let catalogURL = null;
+
+const updatePermalink = (filterArray) => {
+    filterArray.forEach((filter) => {
+        const fieldname = 'customfield_' + filter.shortname;
+        if (filter.value) {
+            catalogURL.searchParams.append(fieldname + '[operator]', filter.operator);
+            catalogURL.searchParams.append(fieldname + '[value]', filter.value);
+            catalogURL.searchParams.append(fieldname + '[type]', filter.type);
+        }
+    });
+
+    Templates.render('local_activitylibrary/permalink', {url: catalogURL.toString()})
+        .then((html, js) => Templates.replaceNodeContents('#activitylibrary-permalink', html, js))
+        .catch(Notification.exception);
+};
 
 /**
  * Permalink helper.
@@ -54,19 +68,16 @@ export default class Permalink {
     static init() {
         catalogURL = new URL(window.location.href);
 
-        $(document).on('activitylibrary-filters-change', (e, filterArray) => {
-            filterArray.forEach((filter) => {
-                const fieldname = 'customfield_' + filter.shortname;
-                if (filter.value) {
-                    catalogURL.searchParams.append(fieldname + '[operator]', filter.operator);
-                    catalogURL.searchParams.append(fieldname + '[value]', filter.value);
-                    catalogURL.searchParams.append(fieldname + '[type]', filter.type);
-                }
-            });
-
-            Templates.render('local_activitylibrary/permalink', {url: catalogURL.toString()})
-                .then((html, js) => Templates.replaceNodeContents('#activitylibrary-permalink', html, js))
-                .catch(Notification.exception);
+        document.addEventListener('activitylibrary-filters-change', (event) => {
+            if (event.detail) {
+                updatePermalink(event.detail);
+            }
         });
+
+        if (window.jQuery) {
+            window.jQuery(document).on('activitylibrary-filters-change', (e, filterArray) => {
+                updatePermalink(filterArray);
+            });
+        }
     }
 }

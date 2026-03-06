@@ -20,7 +20,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import $ from 'jquery';
 import View from 'local_activitylibrary/view';
 import ViewNav from 'local_activitylibrary/view_nav';
 
@@ -34,8 +33,7 @@ export default class ActivityLibrary {
      * @param {object} root The root element for the overview block.
      */
     static init(root) {
-        const rootNode = $(root);
-        ViewNav.init(rootNode);
-        View.init(rootNode);
+        ViewNav.init(root);
+        View.init(root);
     }
 }

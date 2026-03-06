@@ -72,13 +72,13 @@
     </div>
 </div>
 {{#js}}
-require(['jquery', 'local_activitylibrary/activitylibrary',
+require(['local_activitylibrary/activitylibrary',
     'local_activitylibrary/filtersform',
     'local_activitylibrary/permalink'
-    ], function($, Main, FiltersForm, Permalink) {
-    var root = $('#local-activitylibrary-{{uniqid}}');
+    ], function(Main, FiltersForm, Permalink) {
+    var root = document.getElementById('local-activitylibrary-{{uniqid}}');
     Main.init(root);
-    var filters = $('#activitylibrary-filter-{{uniqid}}');
+    var filters = document.getElementById('activitylibrary-filter-{{uniqid}}');
     FiltersForm.init(filters);
     Permalink.init();
 });

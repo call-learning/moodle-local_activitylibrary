@@ -25,17 +25,21 @@ defined('MOODLE_INTERNAL') || die;
 if ($hassiteconfig) {
     $settings = new admin_category('activitylibrary', get_string('pluginname', 'local_activitylibrary'));
 
-    $settings->add('activitylibrary',
-        new admin_externalpage('activitylibrary_customfield',
+    $settings->add(
+        'activitylibrary',
+        new admin_externalpage(
+            'activitylibrary_customfield',
             new lang_string('activitylibrary_customfield', 'local_activitylibrary'),
             $CFG->wwwroot . '/local/activitylibrary/activityfields.php',
             ['local/activitylibrary:manage']
         )
     );
-    $mainsettings = new admin_settingpage('activitylibrarymainsettings',
+    $mainsettings = new admin_settingpage(
+        'activitylibrarymainsettings',
         get_string('activitylibrarymainsettings', 'local_activitylibrary'),
         ['local/activitylibrary:manage'],
-        empty($CFG->enableactivitylibrary));
+        empty($CFG->enableactivitylibrary)
+    );
 
     $samplemenutext = '';
     $stringmanager = get_string_manager();
@@ -44,7 +48,8 @@ if ($hassiteconfig) {
         $samplemenutext .= \html_writer::tag('p', "\"{$text}\"|{$lang}\n");
     }
     $mainsettings->add(
-        new admin_setting_configtextarea('local_activitylibrary/menutextoverride',
+        new admin_setting_configtextarea(
+            'local_activitylibrary/menutextoverride',
             get_string('activitylibrary:menutextoverride', 'local_activitylibrary'),
             get_string('activitylibrary:menutextoverride:desc', 'local_activitylibrary', $samplemenutext),
             ''
@@ -57,10 +62,12 @@ if ($hassiteconfig) {
         $ADMIN->add('courses', $settings); // Add it to the course menu.
     }
     // Create a global Advanced Feature Toggle.
-    $enableoption = new admin_setting_configcheckbox('enableactivitylibrary',
+    $enableoption = new admin_setting_configcheckbox(
+        'enableactivitylibrary',
         new lang_string('enableactivitylibrary', 'local_activitylibrary'),
         new lang_string('enableactivitylibrary', 'local_activitylibrary'),
-        1);
+        1
+    );
     $enableoption->set_updatedcallback('local_activitylibrary_enable_disable_plugin_callback');
 
     $optionalsubsystems = $ADMIN->locate('optionalsubsystems');

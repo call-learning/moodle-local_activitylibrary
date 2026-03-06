@@ -56,6 +56,11 @@ final class lib_hooks_test extends testcase {
         $this->setUser($user);
 
         $formwrapper = new class {
+            /**
+             * Return system context for hook invocation.
+             *
+             * @return \context_system
+             */
             public function get_context() {
                 return \context_system::instance();
             }

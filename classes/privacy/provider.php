@@ -24,8 +24,8 @@
 
 namespace local_activitylibrary\privacy;
 
-use core_privacy\local\request\user_preference_provider;
 use core_privacy\local\metadata\collection;
+use core_privacy\local\request\user_preference_provider;
 use core_privacy\local\request\writer;
 
 /**
@@ -36,7 +36,6 @@ use core_privacy\local\request\writer;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements \core_privacy\local\metadata\provider, user_preference_provider {
-
     /**
      * Returns meta-data information about the activitylibrary plugin.
      *
@@ -44,10 +43,18 @@ class provider implements \core_privacy\local\metadata\provider, user_preference
      * @return \core_privacy\local\metadata\collection Return the collection of meta-data.
      */
     public static function get_metadata(collection $collection): collection {
-        $collection->add_user_preference('local_activitylibrary_user_sort_preference', 'privacy:metadata:activitylibrarysortpreference');
-        $collection->add_user_preference('local_activitylibrary_user_view_preference', 'privacy:metadata:activitylibraryviewpreference');
-        $collection->add_user_preference('local_activitylibrary_user_paging_preference',
-            'privacy:metadata:activitylibrarypagingpreference');
+        $collection->add_user_preference(
+            'local_activitylibrary_user_sort_preference',
+            'privacy:metadata:activitylibrarysortpreference'
+        );
+        $collection->add_user_preference(
+            'local_activitylibrary_user_view_preference',
+            'privacy:metadata:activitylibraryviewpreference'
+        );
+        $collection->add_user_preference(
+            'local_activitylibrary_user_paging_preference',
+            'privacy:metadata:activitylibrarypagingpreference'
+        );
         return $collection;
     }
     /**
@@ -58,25 +65,32 @@ class provider implements \core_privacy\local\metadata\provider, user_preference
     public static function export_user_preferences(int $userid) {
         $preference = get_user_preferences('local_activitylibrary_user_sort_preference', null, $userid);
         if (isset($preference)) {
-            writer::export_user_preference('local_activitylibrary',
-                'local_activitylibrary_user_sort_preference', get_string($preference, 'local_activitylibrary'),
-                get_string('privacy:metadata:activitylibrarysortpreference', 'local_activitylibrary'));
+            writer::export_user_preference(
+                'local_activitylibrary',
+                'local_activitylibrary_user_sort_preference',
+                get_string($preference, 'local_activitylibrary'),
+                get_string('privacy:metadata:activitylibrarysortpreference', 'local_activitylibrary')
+            );
         }
 
         $preference = get_user_preferences('local_activitylibrary_user_view_preference', null, $userid);
         if (isset($preference)) {
-            writer::export_user_preference('local_activitylibrary',
+            writer::export_user_preference(
+                'local_activitylibrary',
                 'local_activitylibrary_user_view_preference',
                 get_string($preference, 'local_activitylibrary'),
-                get_string('privacy:metadata:activitylibraryviewpreference', 'local_activitylibrary'));
+                get_string('privacy:metadata:activitylibraryviewpreference', 'local_activitylibrary')
+            );
         }
 
         $preference = get_user_preferences('local_activitylibrary_user_paging_preference', null, $userid);
         if (isset($preference)) {
-            \core_privacy\local\request\writer::export_user_preference('local_activitylibrary',
+            \core_privacy\local\request\writer::export_user_preference(
+                'local_activitylibrary',
                 'local_activitylibrary_user_paging_preference',
                 $preference,
-                get_string('privacy:metadata:activitylibrarypagingpreference', 'local_activitylibrary'));
+                get_string('privacy:metadata:activitylibrarypagingpreference', 'local_activitylibrary')
+            );
         }
     }
 }

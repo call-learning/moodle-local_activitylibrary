@@ -41,7 +41,7 @@ final class privacy_test extends \core_privacy\tests\provider_testcase {
      */
     public function test_get_metadata(): void {
         $items = provider::get_metadata(new collection('local_activitylibrary'))->get_collection();
-        $names = array_map(function($item) {
+        $names = array_map(function ($item) {
             return $item->get_name();
         }, $items);
 

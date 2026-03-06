@@ -56,12 +56,19 @@ class get_filtered_activities extends external_api {
                 'filters' => new external_multiple_structure(
                     new external_single_structure(
                         [
-                            'type' => new external_value(PARAM_ALPHANUM,
-                                'Filter type as per customfield type.'),
-                            'shortname' => new external_value(PARAM_ALPHANUMEXT,
-                                'Matching customfield shortname if it is a customfield filter', VALUE_OPTIONAL),
-                            'operator' => new external_value(PARAM_INT,
-                                'Filter option as per local_activitylibrary\\local\\filters options.'),
+                            'type' => new external_value(
+                                PARAM_ALPHANUM,
+                                'Filter type as per customfield type.'
+                            ),
+                            'shortname' => new external_value(
+                                PARAM_ALPHANUMEXT,
+                                'Matching customfield shortname if it is a customfield filter',
+                                VALUE_OPTIONAL
+                            ),
+                            'operator' => new external_value(
+                                PARAM_INT,
+                                'Filter option as per local_activitylibrary\\local\\filters options.'
+                            ),
                             'value' => new external_value(PARAM_RAW, 'The value of the filter to look for.'),
                         ]
                     ),
@@ -74,8 +81,10 @@ class get_filtered_activities extends external_api {
                     new external_single_structure(
                         [
                             'column' => new external_value(PARAM_ALPHANUM, 'Column name for sorting'),
-                            'order' => new external_value(PARAM_ALPHA,
-                                'ASC for ascending, DESC for descending; ascending by default'),
+                            'order' => new external_value(
+                                PARAM_ALPHA,
+                                'ASC for ascending, DESC for descending; ascending by default'
+                            ),
                         ]
                     ),
                     'Sort the results',
@@ -88,7 +97,6 @@ class get_filtered_activities extends external_api {
     /**
      * Get activities from one course, several courses, or all courses.
      *
-     * @param int $courseid
      * @param array $courseids
      * @param array $filters
      * @param int $limit
@@ -271,14 +279,14 @@ class get_filtered_activities extends external_api {
             $column = $firstsort['column'];
             $order = strtoupper($firstsort['order']);
             if ($column === 'timemodified') {
-                usort($modulesinfo, function($left, $right) use ($order) {
+                usort($modulesinfo, function ($left, $right) use ($order) {
                     $leftvalue = $left['timemodified'] ?? 0;
                     $rightvalue = $right['timemodified'] ?? 0;
                     return $order === 'DESC' ? $rightvalue <=> $leftvalue : $leftvalue <=> $rightvalue;
                 });
             }
             if ($column === 'fullname') {
-                usort($modulesinfo, function($left, $right) use ($order) {
+                usort($modulesinfo, function ($left, $right) use ($order) {
                     $leftvalue = $left['fullname'] ?? '';
                     $rightvalue = $right['fullname'] ?? '';
                     return $order === 'DESC' ? $rightvalue <=> $leftvalue : $leftvalue <=> $rightvalue;

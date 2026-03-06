@@ -27,8 +27,6 @@ namespace local_activitylibrary\local;
 use local_activitylibrary\customfield\coursemodule_handler;
 use local_activitylibrary\test\testcase;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Unit tests for utils.
  */
@@ -84,4 +82,3 @@ final class utils_test extends testcase {
         $this->assertStringContainsString('/local/activitylibrary/index.php', $url->out(false));
     }
 }
-

@@ -26,8 +26,6 @@ namespace local_activitylibrary\test;
 
 use local_activitylibrary\local\utils;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Shared base testcase for local_activitylibrary tests.
  */

@@ -27,8 +27,6 @@ use core_external\external_api;
 use local_activitylibrary\local\utils;
 use local_activitylibrary\test\testcase;
 
-defined('MOODLE_INTERNAL') || die();
-
 
 /**
  * Unit tests for manage_customfields external methods.

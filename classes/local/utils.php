@@ -35,11 +35,10 @@ use Matrix\Exception;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class utils {
-
     /**
      * @var array $hiddenfields
      */
-    static private $hiddenfields = null;
+    private static $hiddenfields = null;
 
     /**
      * Get Activity library URL and text description for the current page
@@ -202,7 +201,7 @@ class utils {
         }
         try {
             $alllangs = array_map(
-                function($value) {
+                function ($value) {
                     return explode('|', $value);
                 },
                 explode("\n", $rsmenutext)

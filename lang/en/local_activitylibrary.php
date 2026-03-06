@@ -23,6 +23,31 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 $string['activity_metadata'] = 'Metatdata for Activity Library';
+$string['activitylibrary'] = 'Activity library';
+$string['activitylibrary:changelockedcustomfields'] = 'Can change locked Activity Library Custom Field values';
+$string['activitylibrary:configurecustomfields'] = 'Can configure Activity Library Custom Field values';
+$string['activitylibrary:editvalue'] = 'Can edit Activity Library Custom Field values';
+$string['activitylibrary:hiddencoursesid'] = 'Hidden courses Id';
+$string['activitylibrary:hiddencoursesid:desc'] = 'List of comma separated
+ courses identifiers (course id) that will be invisible on the catalog';
+$string['activitylibrary:manage'] = 'Can manage Activity Library';
+$string['activitylibrary:managefields'] = 'Can manage Activity Library Fields';
+$string['activitylibrary:menutextoverride'] = 'Text for menu/link';
+$string['activitylibrary:menutextoverride:desc'] = 'Text for activity library menu/link, defaults to "activitylibrary". We define
+ one for each language for example {$a}';
+$string['activitylibrary:setitemsvisibility'] = 'Can set items visibility';
+$string['activitylibrary:view'] = 'Can view locked Activity Library Custom Field values';
+$string['activitylibrary_customfield'] = 'Manage custom fields for Activity Library';
+$string['activitylibraryfield_islocked'] = 'Field is locked';
+$string['activitylibraryfield_islocked_help'] = 'Field is locked';
+$string['activitylibraryfield_notvisible'] = 'Activity Library Field not visible';
+$string['activitylibraryfield_visibility'] = 'Activity Library Field visibility';
+$string['activitylibraryfield_visibility_help'] = 'Activity Library Field visibility';
+$string['activitylibraryfield_visibletoall'] = 'Field is visible to all';
+$string['activitylibraryfield_visibletoteachers'] = 'Activity Library Field is visible to teachers';
+$string['activitylibraryfield_visibletoteachers_help'] = 'Activity Library Field is visible to teachers';
+$string['activitylibraryfieldsettings'] = 'Activity Library Field Settings';
+$string['activitylibrarymainsettings'] = 'Activity Library: Global Settings';
 $string['aria:card'] = 'Switch to card view';
 $string['aria:controls'] = 'Display controls';
 $string['aria:displaydropdown'] = 'Display drop-down menu';
@@ -57,31 +82,6 @@ $string['pluginname'] = 'Activity Library';
 $string['privacy:metadata:activitylibrarypagingpreference'] = 'Paging preference';
 $string['privacy:metadata:activitylibrarysortpreference'] = 'Sort preference';
 $string['privacy:metadata:activitylibraryviewpreference'] = 'View (List/Card) preference';
-$string['activitylibrary'] = 'Activity library';
-$string['activitylibrary:changelockedcustomfields'] = 'Can change locked Activity Library Custom Field values';
-$string['activitylibrary:configurecustomfields'] = 'Can configure Activity Library Custom Field values';
-$string['activitylibrary:editvalue'] = 'Can edit Activity Library Custom Field values';
-$string['activitylibrary:hiddencoursesid'] = 'Hidden courses Id';
-$string['activitylibrary:hiddencoursesid:desc'] = 'List of comma separated
- courses identifiers (course id) that will be invisible on the catalog';
-$string['activitylibrary:manage'] = 'Can manage Activity Library';
-$string['activitylibrary:managefields'] = 'Can manage Activity Library Fields';
-$string['activitylibrary:menutextoverride'] = 'Text for menu/link';
-$string['activitylibrary:menutextoverride:desc'] = 'Text for activity library menu/link, defaults to "activitylibrary". We define
- one for each language for example {$a}';
-$string['activitylibrary:setitemsvisibility'] = 'Can set items visibility';
-$string['activitylibrary:view'] = 'Can view locked Activity Library Custom Field values';
-$string['activitylibrary_customfield'] = 'Manage custom fields for Activity Library';
-$string['activitylibraryfield_islocked'] = 'Field is locked';
-$string['activitylibraryfield_islocked_help'] = 'Field is locked';
-$string['activitylibraryfield_notvisible'] = 'Activity Library Field not visible';
-$string['activitylibraryfield_visibility'] = 'Activity Library Field visibility';
-$string['activitylibraryfield_visibility_help'] = 'Activity Library Field visibility';
-$string['activitylibraryfield_visibletoall'] = 'Field is visible to all';
-$string['activitylibraryfield_visibletoteachers'] = 'Activity Library Field is visible to teachers';
-$string['activitylibraryfield_visibletoteachers_help'] = 'Activity Library Field is visible to teachers';
-$string['activitylibraryfieldsettings'] = 'Activity Library Field Settings';
-$string['activitylibrarymainsettings'] = 'Activity Library: Global Settings';
 $string['settingvisibilitynotallowed'] = 'Setting visibility is not allowed';
 $string['showincatalogue'] = 'Show in catalogue';
 $string['title'] = 'Full name';

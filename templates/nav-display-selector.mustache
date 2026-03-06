@@ -23,7 +23,8 @@
     {
         "cards": true,
         "list": false,
-        "summary": false
+        "summary": false,
+        "uniqid": "would-be-a-uniqid"
     }
 }}
 <div class="dropdown mb-1">
@@ -37,12 +38,12 @@
     </button>
     <ul class="dropdown-menu" data-show-active-item aria-labelledby="displaydropdown">
         <li>
-            <a class="dropdown-item {{#cards}}active{{/cards}}" href="#" data-display-option="cards" aria-label="{{#str}} aria:card, local_activitylibrary {{/str}}" aria-controls="entities-view-{{uniqid}}">
+            <a class="dropdown-item {{#cards}}active{{/cards}}" href="#" data-display-option="cards" aria-label="{{#str}} aria:card, local_activitylibrary {{/str}}">
             {{#str}} card, local_activitylibrary {{/str}}
             </a>
         </li>
         <li>
-            <a class="dropdown-item {{#list}}active{{/list}}" href="#" data-display-option="list"  aria-label="{{#str}} aria:list, local_activitylibrary {{/str}}" aria-controls="entities-view-{{uniqid}}">
+            <a class="dropdown-item {{#list}}active{{/list}}" href="#" data-display-option="list"  aria-label="{{#str}} aria:list, local_activitylibrary {{/str}}">
             {{#str}} list, local_activitylibrary {{/str}}
             </a>
         </li>

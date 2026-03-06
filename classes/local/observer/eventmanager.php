@@ -42,6 +42,5 @@ class eventmanager {
      * @param \core\event\course_created $event The course created event.
      */
     public static function course_created(\core\event\course_created $event) {
-
     }
 }

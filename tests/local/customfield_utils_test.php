@@ -28,8 +28,6 @@ use local_activitylibrary\customfield\coursemodule_handler;
 use local_activitylibrary\local\filters\text_filter;
 use local_activitylibrary\test\testcase;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Unit tests for customfield_utils.
  */
@@ -101,4 +99,3 @@ final class customfield_utils_test extends testcase {
         $this->assertContains('%needle%', array_values($sqlparams));
     }
 }
-

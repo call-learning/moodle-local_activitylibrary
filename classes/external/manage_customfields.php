@@ -34,8 +34,6 @@ use core_external\external_single_structure;
 use core_external\external_value;
 use local_activitylibrary\local\utils;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Class used for Ajax Management of the custom field (administration)
  *
@@ -43,7 +41,6 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class manage_customfields extends external_api {
-
     /**
      * Returns description of method parameters
      *
@@ -52,10 +49,14 @@ class manage_customfields extends external_api {
     public static function get_hidden_fields_filters_parameters() {
         return new external_function_parameters(
             [
-                'component' => new external_value(PARAM_ALPHANUMEXT,
-                    'customfield handler type course'),
-                'area' => new external_value(PARAM_ALPHANUMEXT,
-                    'customfield handler area'),
+                'component' => new external_value(
+                    PARAM_ALPHANUMEXT,
+                    'customfield handler type course'
+                ),
+                'area' => new external_value(
+                    PARAM_ALPHANUMEXT,
+                    'customfield handler area'
+                ),
             ]
         );
     }
@@ -75,7 +76,7 @@ class manage_customfields extends external_api {
         $inparams = compact(['component', 'area']);
         self::validate_parameters(self::get_hidden_fields_filters_parameters(), $inparams);
         $handler = handler::get_handler($component, $area);
-        return array_map(function(string $shortname): array {
+        return array_map(function (string $shortname): array {
             return ['shortname' => $shortname];
         }, array_values(utils::get_hidden_fields_filters($handler)));
     }
@@ -105,10 +106,14 @@ class manage_customfields extends external_api {
     public static function hide_fields_filter_parameters() {
         return new external_function_parameters(
             [
-                'component' => new external_value(PARAM_ALPHANUMEXT,
-                    'customfield handler type course'),
-                'area' => new external_value(PARAM_ALPHANUMEXT,
-                    'customfield handler area'),
+                'component' => new external_value(
+                    PARAM_ALPHANUMEXT,
+                    'customfield handler type course'
+                ),
+                'area' => new external_value(
+                    PARAM_ALPHANUMEXT,
+                    'customfield handler area'
+                ),
                 'fieldshortnames' => new external_multiple_structure(
                     new external_value(PARAM_ALPHANUMEXT, 'ccustomfield shortname')
                 ),
@@ -152,10 +157,14 @@ class manage_customfields extends external_api {
     public static function show_fields_filter_parameters() {
         return new external_function_parameters(
             [
-                'component' => new external_value(PARAM_ALPHANUMEXT,
-                    'customfield handler type course'),
-                'area' => new external_value(PARAM_ALPHANUMEXT,
-                    'customfield handler area'),
+                'component' => new external_value(
+                    PARAM_ALPHANUMEXT,
+                    'customfield handler type course'
+                ),
+                'area' => new external_value(
+                    PARAM_ALPHANUMEXT,
+                    'customfield handler area'
+                ),
                 'fieldshortnames' => new external_multiple_structure(
                     new external_value(PARAM_ALPHANUMEXT, 'ccustomfield shortname')
                 ),
@@ -190,5 +199,4 @@ class manage_customfields extends external_api {
     public static function show_fields_filter_returns() {
         return null;
     }
-
 }

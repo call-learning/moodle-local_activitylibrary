@@ -24,6 +24,33 @@
  */
 
 $string['activity_metadata'] = 'Metatdata pour la Bibliothèque d\'activités';
+$string['activitylibrary'] = 'Bibliothèque d\'activités';
+$string['activitylibrary:activateactivitylibrary'] = 'Activer la bibliothèque d\'activités';
+$string['activitylibrary:activateactivitylibrary:desc'] =
+    'La bibliothèque d\'activités est similaire à la bibliothèque de cours, mais pour les activités de cours';
+$string['activitylibrary:changelockedcustomfields'] = 'Peut éditer les valeurs des champs vérouillés de la Bibliothèque d\'activités';
+$string['activitylibrary:configurecustomfields'] = 'Peut configurer les champs de la Bibliothèque d\'activités';
+$string['activitylibrary:editvalue'] = 'Peut éditer les valeurs des champs de la Bibliothèque d\'activités';
+$string['activitylibrary:hiddencoursesid'] = 'Identifiant des cours invisible sur le catalogue';
+$string['activitylibrary:hiddencoursesid:desc'] = 'Liste des identifiants de cours séparés par des virgules qui n\'apparaîtront
+ pas sur la bibliothèque d\'activités';
+$string['activitylibrary:manage'] = 'Peut gérer la bibliothèque d\'activités';
+$string['activitylibrary:managefields'] = 'Peut gérer les champs de la Bibliothèque d\'activités';
+$string['activitylibrary:menutextoverride'] = 'Texte pour le menu/lien';
+$string['activitylibrary:menutextoverride:desc'] = 'Texte pour le menu/lien, si vide, ce sera la valeur de "activitylibrary".
+ On définit une chaine par langue par exemple {$a}';
+$string['activitylibrary:view'] = 'Peut configurer les champs de la Bibliothèque d\'activités';
+$string['activitylibrary_customfield'] = 'Gestion des champs personalisés de modules';
+$string['activitylibraryfield_islocked'] = 'Le champ est vérouillé';
+$string['activitylibraryfield_islocked_help'] = 'Le champ est vérouillé et ne peut être changé';
+$string['activitylibraryfield_notvisible'] = 'Le champ n\'est pas visible';
+$string['activitylibraryfield_visibility'] = 'Visibilité du champ';
+$string['activitylibraryfield_visibility_help'] = 'Visibilité du champ';
+$string['activitylibraryfield_visibletoall'] = 'Le champ est visible pour tous';
+$string['activitylibraryfield_visibletoteachers'] = 'Le champ est visible pour les enseignants';
+$string['activitylibraryfield_visibletoteachers_help'] = 'Le champ est visible pour les enseignants';
+$string['activitylibraryfieldsettings'] = 'Paramètres des champs de la Bibliothèque d\'activités';
+$string['activitylibrarymainsettings'] = 'Bibliothèque d\'activités : paramètres globaux';
 $string['aria:card'] = 'Vignettes';
 $string['aria:controls'] = 'Paramétrages';
 $string['aria:displaydropdown'] = 'Paramétrages de l\'affichage';
@@ -57,33 +84,6 @@ $string['pluginname'] = 'Bibliothèque d\'activités';
 $string['privacy:metadata:activitylibrarypagingpreference'] = 'Préférences sur la pagination';
 $string['privacy:metadata:activitylibrarysortpreference'] = 'Préférences d\'ordre d\'affichage';
 $string['privacy:metadata:activitylibraryviewpreference'] = 'Préférences de vue (Liste/Carte)';
-$string['activitylibrary'] = 'Bibliothèque d\'activités';
-$string['activitylibrary:activateactivitylibrary'] = 'Activer la bibliothèque d\'activités';
-$string['activitylibrary:activateactivitylibrary:desc'] =
-    'La bibliothèque d\'activités est similaire à la bibliothèque de cours, mais pour les activités de cours';
-$string['activitylibrary:changelockedcustomfields'] = 'Peut éditer les valeurs des champs vérouillés de la Bibliothèque d\'activités';
-$string['activitylibrary:configurecustomfields'] = 'Peut configurer les champs de la Bibliothèque d\'activités';
-$string['activitylibrary:editvalue'] = 'Peut éditer les valeurs des champs de la Bibliothèque d\'activités';
-$string['activitylibrary:hiddencoursesid'] = 'Identifiant des cours invisible sur le catalogue';
-$string['activitylibrary:hiddencoursesid:desc'] = 'Liste des identifiants de cours séparés par des virgules qui n\'apparaîtront
- pas sur la bibliothèque d\'activités';
-$string['activitylibrary:manage'] = 'Peut gérer la bibliothèque d\'activités';
-$string['activitylibrary:managefields'] = 'Peut gérer les champs de la Bibliothèque d\'activités';
-$string['activitylibrary:menutextoverride'] = 'Texte pour le menu/lien';
-$string['activitylibrary:menutextoverride:desc'] = 'Texte pour le menu/lien, si vide, ce sera la valeur de "activitylibrary".
- On définit une chaine par langue par exemple {$a}';
-$string['activitylibrary:view'] = 'Peut configurer les champs de la Bibliothèque d\'activités';
-$string['activitylibrary_customfield'] = 'Gestion des champs personalisés de modules';
-$string['activitylibraryfield_islocked'] = 'Le champ est vérouillé';
-$string['activitylibraryfield_islocked_help'] = 'Le champ est vérouillé et ne peut être changé';
-$string['activitylibraryfield_notvisible'] = 'Le champ n\'est pas visible';
-$string['activitylibraryfield_visibility'] = 'Visibilité du champ';
-$string['activitylibraryfield_visibility_help'] = 'Visibilité du champ';
-$string['activitylibraryfield_visibletoall'] = 'Le champ est visible pour tous';
-$string['activitylibraryfield_visibletoteachers'] = 'Le champ est visible pour les enseignants';
-$string['activitylibraryfield_visibletoteachers_help'] = 'Le champ est visible pour les enseignants';
-$string['activitylibraryfieldsettings'] = 'Paramètres des champs de la Bibliothèque d\'activités';
-$string['activitylibrarymainsettings'] = 'Bibliothèque d\'activités : paramètres globaux';
 $string['title'] = 'Titre';
 $string['title:desc'] = 'Titre (Descendant)';
 $string['viewitem'] = 'Voir';

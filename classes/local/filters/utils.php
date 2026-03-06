@@ -60,7 +60,11 @@ class utils {
                         $classname = $locationtocheck['ns'] . $sourcename;
                         if (class_exists($classname)) {
                             $reflector = new ReflectionClass($classname);
-                            if ($reflector->isSubclassOf(\local_activitylibrary\local\filters\base::class)) {
+                            if (
+                                $reflector->isSubclassOf(
+                                    \local_activitylibrary\local\filters\base::class
+                                )
+                            ) {
                                 $classes[$sourcename] = $classname;
                             }
                         }
@@ -91,8 +95,10 @@ class utils {
         $rootfilters = [];
         foreach ($allfilterclasses as $filtersource => $filterclass) {
             if ($filterclass::check_is_righttype($field)) {
-                if (strpos($filterclass, "\\local_activitylibrary\\local\\filters\\") === 0 ||
-                        strpos($filterclass, "\\local_activitylibrary\\filters\\") === 0) {
+                if (
+                    strpos($filterclass, "\\local_activitylibrary\\local\\filters\\") === 0 ||
+                    strpos($filterclass, "\\local_activitylibrary\\filters\\") === 0
+                ) {
                     $rootfilters[] = $filterclass;
                 } else {
                     $externalfilters[] = $filterclass;
@@ -123,10 +129,12 @@ class utils {
      * @param int $operator
      * @throws \coding_exception
      */
-    public static function add_filter_operators_to_form(&$mform,
+    public static function add_filter_operators_to_form(
+        &$mform,
         $name,
         $type,
-        $operator) {
+        $operator
+    ) {
         $typename = $name . '[type]';
         $operatorname = $name . '[operator]';
         $mform->addElement('hidden', $typename, $type);
@@ -149,12 +157,15 @@ class utils {
                 break;
         }
         if ($opinstructions) {
-            $mform->addElement('static',
+            $mform->addElement(
+                'static',
                 $name . 'instructions',
-                \html_writer::span("(" .
+                \html_writer::span(
+                    "(" .
                     get_string('operator:instructions:' . $opinstructions, 'local_activitylibrary')
                     . "*)",
-                    'filter-instructions')
+                    'filter-instructions'
+                )
             );
         }
     }

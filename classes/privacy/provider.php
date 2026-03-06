@@ -44,8 +44,8 @@ class provider implements \core_privacy\local\metadata\provider, user_preference
      * @return \core_privacy\local\metadata\collection Return the collection of meta-data.
      */
     public static function get_metadata(collection $collection): collection {
-        $collection->add_user_preference('local_activitylibrary_sort_preference', 'privacy:metadata:activitylibrarysortpreference');
-        $collection->add_user_preference('local_activitylibrary_view_preference', 'privacy:metadata:activitylibraryviewpreference');
+        $collection->add_user_preference('local_activitylibrary_user_sort_preference', 'privacy:metadata:activitylibrarysortpreference');
+        $collection->add_user_preference('local_activitylibrary_user_view_preference', 'privacy:metadata:activitylibraryviewpreference');
         $collection->add_user_preference('local_activitylibrary_user_paging_preference',
             'privacy:metadata:activitylibrarypagingpreference');
         return $collection;

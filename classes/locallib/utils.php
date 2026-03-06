@@ -205,7 +205,7 @@ class utils {
                 function($value) {
                     return explode('|', $value);
                 },
-                explode('\n', $rsmenutext)
+                explode("\n", $rsmenutext)
             );
 
             foreach ($alllangs as $lang) {

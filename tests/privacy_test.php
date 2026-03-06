@@ -22,6 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace local_activitylibrary;
+use core_privacy\local\metadata\collection;
 use core_privacy\local\request\writer;
 use local_activitylibrary\privacy\provider;
 
@@ -33,6 +34,22 @@ use local_activitylibrary\privacy\provider;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 final class privacy_test extends \core_privacy\tests\provider_testcase {
+    /**
+     * Ensure metadata includes the declared user preferences.
+     *
+     * @covers \local_activitylibrary\privacy\provider::get_metadata
+     */
+    public function test_get_metadata(): void {
+        $items = provider::get_metadata(new collection('local_activitylibrary'))->get_collection();
+        $names = array_map(function($item) {
+            return $item->get_name();
+        }, $items);
+
+        $this->assertContains('local_activitylibrary_user_sort_preference', $names);
+        $this->assertContains('local_activitylibrary_user_view_preference', $names);
+        $this->assertContains('local_activitylibrary_user_paging_preference', $names);
+    }
+
     /**
      * Ensure that export_user_preferences returns no data if the user has not visited the library page.
      * @covers \local_activitylibrary\privacy\provider::export_user_preferences

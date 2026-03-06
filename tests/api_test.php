@@ -66,11 +66,97 @@ final class api_test extends local_activitylibrary_testcase {
         ] + $this->get_simple_cf_data();
         $dg->create_module('label', (object)$activitydata);
 
-        $activities = get_filtered_activities::execute($course->id);
+        $activities = get_filtered_activities::execute([$course->id]);
         $this->assertCount(1, $activities);
         $first = reset($activities);
         $this->assertEquals('Activity 1', $first['fullname']);
         $this->assertEquals($course->id, $first['parentid']);
+    }
+
+    /**
+     * Test activity filters by module type and fulltext.
+     *
+     * @covers \local_activitylibrary\external\get_filtered_activities::execute
+     * @runInSeparateProcess
+     */
+    public function test_get_filtered_activities_modname_and_fulltext_filters(): void {
+        $dg = $this->getDataGenerator();
+        $course = $dg->create_course();
+
+        $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Alpha label',
+        ] + $this->get_simple_cf_data()));
+        $dg->create_module('page', (object)([
+            'course' => $course->id,
+            'name' => 'Alpha page',
+        ] + $this->get_simple_cf_data()));
+
+        $activities = get_filtered_activities::execute(
+            [$course->id],
+            [
+                ['type' => 'modname', 'operator' => 0, 'value' => 'label'],
+                ['type' => 'fulltext', 'operator' => 0, 'value' => 'alpha'],
+            ]
+        );
+
+        $this->assertCount(1, $activities);
+        $first = reset($activities);
+        $this->assertEquals('label', $first['modname']);
+        $this->assertEquals('Alpha label', $first['fullname']);
+    }
+
+    /**
+     * Test sorting and pagination on retrieved activities.
+     *
+     * @covers \local_activitylibrary\external\get_filtered_activities::execute
+     * @runInSeparateProcess
+     */
+    public function test_get_filtered_activities_sorting_and_pagination(): void {
+        $dg = $this->getDataGenerator();
+        $course = $dg->create_course();
+
+        foreach (['Activity C', 'Activity A', 'Activity B'] as $name) {
+            $dg->create_module('label', (object)([
+                'course' => $course->id,
+                'name' => $name,
+            ] + $this->get_simple_cf_data()));
+        }
+
+        $activities = get_filtered_activities::execute(
+            [$course->id],
+            [],
+            2,
+            1,
+            [['column' => 'fullname', 'order' => 'ASC']]
+        );
+
+        $this->assertCount(2, $activities);
+        $this->assertEquals('Activity B', $activities[0]['fullname']);
+        $this->assertEquals('Activity C', $activities[1]['fullname']);
+    }
+
+    /**
+     * Test that invalid sort entries are ignored in SQL.
+     *
+     * @covers \local_activitylibrary\external\get_filtered_activities::get_sort_options_sql
+     */
+    public function test_get_sort_options_sql_ignores_invalid_entries(): void {
+        $method = new \ReflectionMethod(get_filtered_activities::class, 'get_sort_options_sql');
+        $method->setAccessible(true);
+
+        $sortsql = $method->invoke(
+            null,
+            [
+                ['column' => 'fullname', 'order' => 'asc'],
+                ['column' => 'invalidcolumn', 'order' => 'DESC'],
+                ['column' => 'modname', 'order' => 'DESC'],
+                ['column' => 'timemodified', 'order' => 'INVALID'],
+            ],
+            ['fullname', 'modname', 'timemodified']
+        );
+
+        $this->assertEquals('fullname ASC,modname DESC', $sortsql);
     }
 
 }

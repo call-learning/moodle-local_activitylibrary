@@ -98,6 +98,8 @@ final class manage_customfields_test extends testcase {
         $this->hide_fields_filter('local_activitylibrary', 'coursemodule', ['f1', 'f2']);
         $this->reset_hiddenfields_cache();
         $hidden = $this->get_hidden_fields_filters('local_activitylibrary', 'coursemodule');
+        $this->assertArrayHasKey('shortname', $hidden[0]);
+        $this->assertArrayHasKey('shortname', $hidden[1]);
         $hidden = array_column($hidden, 'shortname');
         sort($hidden);
         $this->assertEquals(['f1', 'f2'], $hidden);
@@ -107,5 +109,35 @@ final class manage_customfields_test extends testcase {
         $hidden = $this->get_hidden_fields_filters('local_activitylibrary', 'coursemodule');
         $hidden = array_column($hidden, 'shortname');
         $this->assertEquals(['f2'], array_values($hidden));
+    }
+
+    /**
+     * Invalid field shortname values are rejected by parameter validation.
+     *
+     * @covers \local_activitylibrary\external\manage_customfields::hide_fields_filter
+     */
+    public function test_hide_fields_filter_rejects_invalid_shortname_parameter(): void {
+        $this->expectException(\invalid_parameter_exception::class);
+        $this->hide_fields_filter('local_activitylibrary', 'coursemodule', ['bad shortname']);
+    }
+
+    /**
+     * Invalid component format is rejected by parameter validation.
+     *
+     * @covers \local_activitylibrary\external\manage_customfields::get_hidden_fields_filters
+     */
+    public function test_get_hidden_fields_filters_rejects_invalid_component_format(): void {
+        $this->expectException(\invalid_parameter_exception::class);
+        $this->get_hidden_fields_filters('local activitylibrary', 'coursemodule');
+    }
+
+    /**
+     * Unknown handler area throws a moodle exception.
+     *
+     * @covers \local_activitylibrary\external\manage_customfields::get_hidden_fields_filters
+     */
+    public function test_get_hidden_fields_filters_rejects_unknown_area(): void {
+        $this->expectException(\moodle_exception::class);
+        $this->get_hidden_fields_filters('local_activitylibrary', 'unknownarea');
     }
 }

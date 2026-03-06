@@ -75,7 +75,9 @@ class manage_customfields extends external_api {
         $inparams = compact(['component', 'area']);
         self::validate_parameters(self::get_hidden_fields_filters_parameters(), $inparams);
         $handler = handler::get_handler($component, $area);
-        return utils::get_hidden_fields_filters($handler);
+        return array_map(function(string $shortname): array {
+            return ['shortname' => $shortname];
+        }, array_values(utils::get_hidden_fields_filters($handler)));
     }
 
     /**

@@ -21,17 +21,60 @@
  * @copyright  2026 CALL Learning
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace local_activitylibrary;
+namespace local_activitylibrary\external;
 
-use local_activitylibrary\external\manage_customfields;
+use core_external\external_api;
 use local_activitylibrary\local\utils;
 use local_activitylibrary\test\testcase;
+
+defined('MOODLE_INTERNAL') || die();
 
 
 /**
  * Unit tests for manage_customfields external methods.
  */
 final class manage_customfields_test extends testcase {
+    /**
+     * Helper.
+     *
+     * @param mixed ...$params
+     * @return mixed
+     */
+    protected function get_hidden_fields_filters(...$params) {
+        $hidden = manage_customfields::get_hidden_fields_filters(...$params);
+        return external_api::clean_returnvalue(manage_customfields::get_hidden_fields_filters_returns(), $hidden);
+    }
+
+    /**
+     * Helper.
+     *
+     * @param mixed ...$params
+     * @return mixed
+     */
+    protected function hide_fields_filter(...$params) {
+        $result = manage_customfields::hide_fields_filter(...$params);
+        $returns = manage_customfields::hide_fields_filter_returns();
+        if ($returns === null) {
+            return $result;
+        }
+        return external_api::clean_returnvalue($returns, $result);
+    }
+
+    /**
+     * Helper.
+     *
+     * @param mixed ...$params
+     * @return mixed
+     */
+    protected function show_fields_filter(...$params) {
+        $result = manage_customfields::show_fields_filter(...$params);
+        $returns = manage_customfields::show_fields_filter_returns();
+        if ($returns === null) {
+            return $result;
+        }
+        return external_api::clean_returnvalue($returns, $result);
+    }
+
     /**
      * Reset static hidden fields cache between assertions.
      */
@@ -52,15 +95,17 @@ final class manage_customfields_test extends testcase {
     public function test_manage_customfields_hide_show_cycle(): void {
         $this->reset_hiddenfields_cache();
 
-        manage_customfields::hide_fields_filter('local_activitylibrary', 'coursemodule', ['f1', 'f2']);
+        $this->hide_fields_filter('local_activitylibrary', 'coursemodule', ['f1', 'f2']);
         $this->reset_hiddenfields_cache();
-        $hidden = manage_customfields::get_hidden_fields_filters('local_activitylibrary', 'coursemodule');
+        $hidden = $this->get_hidden_fields_filters('local_activitylibrary', 'coursemodule');
+        $hidden = array_column($hidden, 'shortname');
         sort($hidden);
         $this->assertEquals(['f1', 'f2'], $hidden);
 
-        manage_customfields::show_fields_filter('local_activitylibrary', 'coursemodule', ['f1']);
+        $this->show_fields_filter('local_activitylibrary', 'coursemodule', ['f1']);
         $this->reset_hiddenfields_cache();
-        $hidden = manage_customfields::get_hidden_fields_filters('local_activitylibrary', 'coursemodule');
+        $hidden = $this->get_hidden_fields_filters('local_activitylibrary', 'coursemodule');
+        $hidden = array_column($hidden, 'shortname');
         $this->assertEquals(['f2'], array_values($hidden));
     }
 }

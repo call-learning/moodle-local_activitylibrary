@@ -15,14 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Tests for activitylibraryfields in courses and modules
+ * Tests for get_filtered_activities external API.
  *
  * @package    local_activitylibrary
  * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace local_activitylibrary;
-use local_activitylibrary\external\get_filtered_activities;
+namespace local_activitylibrary\external;
+
+use core_external\external_api;
 use local_activitylibrary\test\testcase;
 
 defined('MOODLE_INTERNAL') || die();
@@ -33,13 +34,23 @@ require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
 
 /**
- * Tests for externallib static functions
+ * Tests for get_filtered_activities external API.
  *
  * @package    local_activitylibrary
  * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class api_test extends testcase {
+final class get_filtered_activities_test extends testcase {
+    /**
+     * Helper.
+     *
+     * @param mixed ...$params
+     * @return mixed
+     */
+    protected function get_filtered_activities(...$params) {
+        $activities = get_filtered_activities::execute(...$params);
+        return external_api::clean_returnvalue(get_filtered_activities::execute_returns(), $activities);
+    }
 
     /**
      * Test that we can retrieve activities for a given course.
@@ -65,7 +76,7 @@ final class api_test extends testcase {
         ] + $this->get_simple_cf_data();
         $dg->create_module('label', (object)$activitydata);
 
-        $activities = get_filtered_activities::execute([$course->id]);
+        $activities = $this->get_filtered_activities([$course->id]);
         $this->assertCount(1, $activities);
         $first = reset($activities);
         $this->assertEquals('Activity 1', $first['fullname']);
@@ -91,7 +102,7 @@ final class api_test extends testcase {
             'name' => 'Alpha page',
         ] + $this->get_simple_cf_data()));
 
-        $activities = get_filtered_activities::execute(
+        $activities = $this->get_filtered_activities(
             [$course->id],
             [
                 ['type' => 'modname', 'operator' => 0, 'value' => 'label'],
@@ -122,7 +133,7 @@ final class api_test extends testcase {
             ] + $this->get_simple_cf_data()));
         }
 
-        $activities = get_filtered_activities::execute(
+        $activities = $this->get_filtered_activities(
             [$course->id],
             [],
             2,
@@ -225,7 +236,7 @@ final class api_test extends testcase {
         \course_modinfo::clear_instance_cache();
 
         $courseids = $useemptycoursescope ? [] : [$course1->id, $course2->id];
-        $activities = get_filtered_activities::execute($courseids);
+        $activities = $this->get_filtered_activities($courseids);
         $returnednames = array_column($activities, 'fullname');
         sort($returnednames);
         sort($expectednames);

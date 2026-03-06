@@ -39,14 +39,13 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
 class behat_local_activitylibrary extends behat_base {
 
     /**
-     * Checks that the Multiselect Custom Field is installed.
+     * Skip tagged scenarios when the multiselect customfield plugin is unavailable.
      *
-     * @Given /^multiselect field is installed$/
+     * @BeforeScenario @activitylibrary_requires_multiselect
      */
-    public function multiselect_field_is_installed() {
-
+    public function skip_if_multiselect_field_is_not_installed(): void {
         if (!utils::is_multiselect_installed()) {
-            throw new SkippedException;
+            throw new SkippedException('Multiselect customfield is not installed.');
         }
     }
 
@@ -114,39 +113,6 @@ class behat_local_activitylibrary extends behat_base {
      */
     public function i_show_fields_filter(string $shortname) {
         $this->i_set_hidden_filter_of_field_to($shortname, '0');
-    }
-
-    /**
-     * Check that a page contains a list of texts (separated by commas)
-     *
-     * @param string $texts
-     *
-     * @Given /^I should see the texts "(?P<texts>(?:[^"]|\\")*)"$/
-     */
-    public function i_should_see_the_texts(string $texts) {
-        $textarray = array_map('trim', explode(',', $texts));
-        foreach ($textarray as $text) {
-            $text = str_replace('\\"', '"', $text);
-            $this->assertSession()->pageTextContains($text);
-        }
-    }
-
-    /**
-     * Check that a page does not contains a list of texts (separated by commas)
-     *
-     * @param string $texts
-     *
-     * @Given /^I should not see the texts "(?P<texts>(?:[^"]|\\")*)"$/
-     */
-    public function i_should_not_see_the_texts(string $texts) {
-        if (trim($texts) == '') {
-            return;
-        }
-        $textarray = array_map('trim', explode(',', $texts));
-        foreach ($textarray as $text) {
-            $text = str_replace('\\"', '"', $text);
-            $this->assertSession()->pageTextNotContains($text);
-        }
     }
 
 }

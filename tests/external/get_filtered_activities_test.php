@@ -256,6 +256,12 @@ final class get_filtered_activities_test extends testcase {
                 [],
                 ['C1 future', 'C1 visible', 'C2 visible'],
             ],
+            'Admin with empty scope sees visible activities in all courses' => [
+                'admin',
+                true,
+                [],
+                ['C1 future', 'C1 visible', 'C2 visible'],
+            ],
             'Student enrolled in one course only sees that course visible activities' => [
                 'student',
                 true,

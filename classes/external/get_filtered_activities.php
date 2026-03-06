@@ -110,14 +110,19 @@ class get_filtered_activities extends external_api {
         $context = context_system::instance();
         self::validate_context($context);
         $scopeids = array_values(array_unique(array_filter(array_map('intval', $params['courseids']))));
-        foreach($scopeids as $courseid) {
+        foreach ($scopeids as $courseid) {
             $coursecontext = context_course::instance($courseid);
             self::validate_context($coursecontext);
         }
         if (empty($scopeids)) {
-            // Get all courses where user is enrolled (can view)
-            $mycourses = enrol_get_my_courses();
-            $scopeids = array_keys($mycourses);
+            if (is_siteadmin()) {
+                // On the home catalogue admins are not necessarily enrolled in courses.
+                $scopeids = $DB->get_fieldset_select('course', 'id', 'id <> :siteid', ['siteid' => SITEID]);
+            } else {
+                // For regular users, keep catalogue scoped to enrolled/accessible courses.
+                $mycourses = enrol_get_my_courses();
+                $scopeids = array_keys($mycourses);
+            }
         }
 
         if (empty($scopeids)) {

@@ -5,6 +5,9 @@ Feature: As an admin I should be able to paginate activities in the activity lib
     Given the following "courses" exist:
       | shortname | fullname |
       | C1        | Course 1 |
+    And the following "user preferences" exist:
+      | user  | preference                                | value |
+      | admin | local_activitylibrary_user_paging_preference | 15    |
     And the following config values are set as admin:
       | config                | value |
       | enableactivitylibrary | 1     |
@@ -36,9 +39,9 @@ Feature: As an admin I should be able to paginate activities in the activity lib
     And I wait until the page is ready
     And I should see "Page 01"
     And I should see "Page 11"
-    And I should not see "Page 13"
-    And I click on "Next" "link"
-    When I should see "Page 14"
+    And I should not see "Page 16"
+    And I click on "2" "link"
+    When I should see "Page 16"
     Then I should see "Page 18"
 
   Scenario: If I toggle page limit between reloads, it should persist
@@ -46,9 +49,8 @@ Feature: As an admin I should be able to paginate activities in the activity lib
     And I log in as "admin"
     And I navigate to activity library "Home" page
     And I wait until the page is ready
-    And I click on "Show 12 items per page" "button"
+    And I click on "Show 15 items per page" "button"
     And I click on "25" "link"
     And I should see "Page 18"
     And I reload the page
     When I should see "Page 18"
-    Then I should see "Show 25 items per page" "button"

@@ -60,9 +60,6 @@ $string['privacy:metadata:activitylibraryviewpreference'] = 'View (List/Card) pr
 $string['activitylibrary'] = 'Activity library';
 $string['activitylibrary:changelockedcustomfields'] = 'Can change locked Activity Library Custom Field values';
 $string['activitylibrary:configurecustomfields'] = 'Can configure Activity Library Custom Field values';
-$string['activitylibrary:courseviewbaseurl'] = 'Base URL for course view.';
-$string['activitylibrary:courseviewbaseurl:desc'] = 'Base URL for course view. Most of the time it will be /course/view.php.'
-    .' We add the identifier \'id\' to the URL with the id of the course.';
 $string['activitylibrary:editvalue'] = 'Can edit Activity Library Custom Field values';
 $string['activitylibrary:hiddencoursesid'] = 'Hidden courses Id';
 $string['activitylibrary:hiddencoursesid:desc'] = 'List of comma separated
@@ -72,8 +69,6 @@ $string['activitylibrary:managefields'] = 'Can manage Activity Library Fields';
 $string['activitylibrary:menutextoverride'] = 'Text for menu/link';
 $string['activitylibrary:menutextoverride:desc'] = 'Text for activity library menu/link, defaults to "activitylibrary". We define
  one for each language for example {$a}';
-$string['activitylibrary:replacecourseindex'] = 'Replace course index with the Activity Library page.';
-$string['activitylibrary:replacecourseindex:desc'] = 'Replace course index with the Activity Library page.';
 $string['activitylibrary:setitemsvisibility'] = 'Can set items visibility';
 $string['activitylibrary:view'] = 'Can view locked Activity Library Custom Field values';
 $string['activitylibrary_customfield'] = 'Manage custom fields for Activity Library';

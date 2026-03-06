@@ -23,7 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['activity_metadata'] = 'Metatdata pour la Pédagothèque numérique';
+$string['activity_metadata'] = 'Metatdata pour la Bibliothèque d\'activités';
 $string['aria:card'] = 'Vignettes';
 $string['aria:controls'] = 'Paramétrages';
 $string['aria:displaydropdown'] = 'Paramétrages de l\'affichage';
@@ -34,10 +34,10 @@ $string['aria:sortingdropdown'] = 'Paramétrages du tri';
 $string['aria:title'] = 'Titre';
 $string['aria:title:desc'] = 'Titre (Descendant)';
 $string['card'] = 'Vignette';
-$string['category:general']  = 'Pégadothèque numérique: Champs génériques';
+$string['category:general']  = 'Bibliothèque d\'activités : Champs génériques';
 $string['copied'] = 'Copié dans le presse-papier';
-$string['course_metadata'] = 'Metatdata pour la Pédagothèque numérique';
-$string['enableactivitylibrary'] = 'Activer la Pédagothèque numérique';
+$string['course_metadata'] = 'Metatdata pour la Bibliothèque d\'activités';
+$string['enableactivitylibrary'] = 'Activer la Bibliothèque d\'activités';
 $string['filter:anyvalue'] = 'Tous';
 $string['filter:course'] = 'Cours';
 $string['filter:modname'] = 'Type d\'activité';
@@ -53,31 +53,26 @@ $string['manage:hiddenfilter'] = 'Caché pour Filtres?';
 $string['noentities'] = 'Aucun résultats ! Veuillez sélectionner d\'autres valeurs pour les filtres.';
 $string['operator:instructions:greaterthan'] = 'Plus grand que';
 $string['permalink:copy'] = 'Copier';
-$string['pluginname'] = 'Pédagothèque numérique';
+$string['pluginname'] = 'Bibliothèque d\'activités';
 $string['privacy:metadata:activitylibrarypagingpreference'] = 'Préférences sur la pagination';
 $string['privacy:metadata:activitylibrarysortpreference'] = 'Préférences d\'ordre d\'affichage';
 $string['privacy:metadata:activitylibraryviewpreference'] = 'Préférences de vue (Liste/Carte)';
-$string['activitylibrary'] = 'Pédagothèque numérique';
+$string['activitylibrary'] = 'Bibliothèque d\'activités';
 $string['activitylibrary:activateactivitylibrary'] = 'Activer la bibliothèque d\'activités';
 $string['activitylibrary:activateactivitylibrary:desc'] =
-    'La bibliothèque d\'activités est similaire à la pédagothèque numérique mais pour les activités de cours';
-$string['activitylibrary:changelockedcustomfields'] = 'Peut éditer les valeurs des champs vérouillés de la  Pédagothèque numérique';
-$string['activitylibrary:configurecustomfields'] = 'Peut configurer les champs de la  Pédagothèque numérique';
-$string['activitylibrary:coursviewbaseurl'] = 'URL de base pour voir le cours.';
-$string['activitylibrary:coursviewbaseurl:desc'] = 'URL de base pour voir le cours. La plupart du temps: ce sera /course/view.php.'
-    .' On rajoute l\'identifiant id qui sera celui du cours.';
-$string['activitylibrary:editvalue'] = 'Peut éditer les valeurs des champs de la  Pédagothèque numérique';
+    'La bibliothèque d\'activités est similaire à la bibliothèque de cours, mais pour les activités de cours';
+$string['activitylibrary:changelockedcustomfields'] = 'Peut éditer les valeurs des champs vérouillés de la Bibliothèque d\'activités';
+$string['activitylibrary:configurecustomfields'] = 'Peut configurer les champs de la Bibliothèque d\'activités';
+$string['activitylibrary:editvalue'] = 'Peut éditer les valeurs des champs de la Bibliothèque d\'activités';
 $string['activitylibrary:hiddencoursesid'] = 'Identifiant des cours invisible sur le catalogue';
 $string['activitylibrary:hiddencoursesid:desc'] = 'Liste des identifiants de cours séparés par des virgules qui n\'apparaîtront
- pas sur la pédagothèque numérique';
-$string['activitylibrary:manage'] = 'Peut gérer la pédagothèque numérique';
-$string['activitylibrary:managefields'] = 'Peut gérer les champs de la  Pédagothèque numérique';
+ pas sur la bibliothèque d\'activités';
+$string['activitylibrary:manage'] = 'Peut gérer la bibliothèque d\'activités';
+$string['activitylibrary:managefields'] = 'Peut gérer les champs de la Bibliothèque d\'activités';
 $string['activitylibrary:menutextoverride'] = 'Texte pour le menu/lien';
 $string['activitylibrary:menutextoverride:desc'] = 'Texte pour le menu/lien, si vide, ce sera la valeur de "activitylibrary".
  On définit une chaine par langue par exemple {$a}';
-$string['activitylibrary:replacecourseindex'] = 'Remplacer la page de liste de cours par la page de pédagothèque numérique.';
-$string['activitylibrary:replacecourseindex:desc'] = 'Remplacer la page de liste de cours par la page de pédagothèque numérique.';
-$string['activitylibrary:view'] = 'Peut configurer les champs de la  Pédagothèque numérique';
+$string['activitylibrary:view'] = 'Peut configurer les champs de la Bibliothèque d\'activités';
 $string['activitylibrary_customfield'] = 'Gestion des champs personalisés de modules';
 $string['activitylibraryfield_islocked'] = 'Le champ est vérouillé';
 $string['activitylibraryfield_islocked_help'] = 'Le champ est vérouillé et ne peut être changé';
@@ -87,8 +82,8 @@ $string['activitylibraryfield_visibility_help'] = 'Visibilité du champ';
 $string['activitylibraryfield_visibletoall'] = 'Le champ est visible pour tous';
 $string['activitylibraryfield_visibletoteachers'] = 'Le champ est visible pour les enseignants';
 $string['activitylibraryfield_visibletoteachers_help'] = 'Le champ est visible pour les enseignants';
-$string['activitylibraryfieldsettings'] = 'Paramètres des champs de la Pédagothèque numérique';
-$string['activitylibrarymainsettings'] = 'Pégadothèque numérique: paramètres globaux';
+$string['activitylibraryfieldsettings'] = 'Paramètres des champs de la Bibliothèque d\'activités';
+$string['activitylibrarymainsettings'] = 'Bibliothèque d\'activités : paramètres globaux';
 $string['title'] = 'Titre';
 $string['title:desc'] = 'Titre (Descendant)';
 $string['viewitem'] = 'Voir';

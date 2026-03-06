@@ -37,11 +37,6 @@ if ($hassiteconfig) {
         ['local/activitylibrary:manage'],
         empty($CFG->enableactivitylibrary));
 
-    $mainsettings->add(new admin_setting_configtext('local_activitylibrary/courseviewbaseurl',
-        get_string('activitylibrary:courseviewbaseurl', 'local_activitylibrary'),
-        get_string('activitylibrary:courseviewbaseurl:desc', 'local_activitylibrary'),
-        '/course/view.php'));
-
     $samplemenutext = '';
     $stringmanager = get_string_manager();
     foreach (['en', 'fr'] as $lang) {
@@ -55,12 +50,6 @@ if ($hassiteconfig) {
             ''
         )
     );
-
-    $mainsettings->add(new admin_setting_configcheckbox('local_activitylibrary/replacecourseindex',
-        get_string('activitylibrary:replacecourseindex', 'local_activitylibrary'),
-        get_string('activitylibrary:replacecourseindex:desc', 'local_activitylibrary'),
-        true));
-
 
     $settings->add('activitylibrary', $mainsettings);
 

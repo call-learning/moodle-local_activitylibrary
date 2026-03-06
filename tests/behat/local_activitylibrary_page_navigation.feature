@@ -37,7 +37,7 @@ Feature: As an admin I should be able to paginate activities in the activity lib
     And I should see "Page 01"
     And I should see "Page 11"
     And I should not see "Page 13"
-    And I click on "li.page-item[data-control='next'] a" "css"
+    And I click on "Next" "link"
     When I should see "Page 14"
     Then I should see "Page 18"
 
@@ -47,8 +47,8 @@ Feature: As an admin I should be able to paginate activities in the activity lib
     And I navigate to activity library "Home" page
     And I wait until the page is ready
     And I click on "Show 12 items per page" "button"
-    And I click on "24" "link"
+    And I click on "25" "link"
     And I should see "Page 18"
     And I reload the page
     When I should see "Page 18"
-    Then I should see "24" in the "[data-action='limit-toggle']" "css_element"
+    Then I should see "Show 25 items per page" "button"

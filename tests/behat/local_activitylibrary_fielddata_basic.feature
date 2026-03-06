@@ -33,3 +33,19 @@ Feature: As an admin I should be able to filter activities using module custom f
     Then I wait until the page is ready
     And I should see "PageName1"
     And I should not see "PageName2"
+
+  Scenario: As an admin I can hide then show a custom field filter
+    Given I am on site homepage
+    And I log in as "admin"
+    And I navigate to activity library custom field management page
+    And I hide fields filter "CF1"
+    And I wait until the page is ready
+    And I navigate to activity library "Home" page
+    And I expand all fieldsets
+    And I should not see "Test Field Text"
+    And I navigate to activity library custom field management page
+    And I show fields filter "CF1"
+    And I wait until the page is ready
+    And I navigate to activity library "Home" page
+    And I expand all fieldsets
+    Then I should see "Test Field Text"

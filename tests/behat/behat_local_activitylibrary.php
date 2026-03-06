@@ -23,6 +23,7 @@
  */
 
 use local_activitylibrary\local\utils;
+use Behat\Mink\Exception\ExpectationException;
 use Moodle\BehatExtension\Exception\SkippedException;
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
@@ -62,6 +63,57 @@ class behat_local_activitylibrary extends behat_base {
             $url->param('courseid', $courseid);
         }
         $this->execute('behat_general::i_visit', [$url]);
+    }
+
+    /**
+     * Navigate to the custom field management page.
+     *
+     * @Given /^I navigate to activity library custom field management page$/
+     */
+    public function i_navigate_to_activity_library_custom_field_management_page() {
+        $this->execute('behat_general::i_visit', [new moodle_url('/local/activitylibrary/activityfields.php')]);
+    }
+
+    /**
+     * Set hidden filter state for a custom field shortname.
+     *
+     * @param string $shortname
+     * @param string $hidden
+     * @Given /^I set hidden filter of field "(?P<shortname_string>(?:[^"]|\\")*)" to "(?P<hidden_string>(?:0|1))"$/
+     */
+    public function i_set_hidden_filter_of_field_to(string $shortname, string $hidden) {
+        $selector = 'input.hide_field_filter[data-field-shortname="' . $shortname . '"]';
+        $checkbox = $this->find('css', $selector);
+        $targetstate = ($hidden === '1');
+        if ((bool)$checkbox->isChecked() !== $targetstate) {
+            $checkbox->click();
+        }
+        if ((bool)$checkbox->isChecked() !== $targetstate) {
+            throw new ExpectationException(
+                'Unable to set hidden filter state for field shortname "' . $shortname . '"',
+                $this->getSession()
+            );
+        }
+    }
+
+    /**
+     * Hide custom field from filters by shortname.
+     *
+     * @param string $shortname
+     * @Given /^I hide fields filter "(?P<shortname_string>(?:[^"]|\\")*)"$/
+     */
+    public function i_hide_fields_filter(string $shortname) {
+        $this->i_set_hidden_filter_of_field_to($shortname, '1');
+    }
+
+    /**
+     * Show custom field in filters by shortname.
+     *
+     * @param string $shortname
+     * @Given /^I show fields filter "(?P<shortname_string>(?:[^"]|\\")*)"$/
+     */
+    public function i_show_fields_filter(string $shortname) {
+        $this->i_set_hidden_filter_of_field_to($shortname, '0');
     }
 
     /**

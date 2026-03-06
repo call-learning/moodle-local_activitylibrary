@@ -271,4 +271,77 @@ final class get_filtered_activities_test extends testcase {
         ];
     }
 
+    /**
+     * Test customfield filters by type.
+     *
+     * @param string $shortname
+     * @param mixed $matchingvalue
+     * @param mixed $nonmatchingvalue
+     * @param string $filtervalue
+     * @dataProvider customfield_filter_provider
+     * @covers \local_activitylibrary\external\get_filtered_activities::execute
+     * @runInSeparateProcess
+     */
+    public function test_get_filtered_activities_customfield_filters(
+        string $shortname,
+        $matchingvalue,
+        $nonmatchingvalue,
+        string $filtervalue
+    ): void {
+        if ($shortname === 'f4' && !\local_activitylibrary\local\utils::is_multiselect_installed()) {
+            $this->markTestSkipped('Multiselect customfield is not installed.');
+        }
+
+        $dg = $this->getDataGenerator();
+        $course = $dg->create_course();
+        $matchdata = $this->get_simple_cf_data();
+        $nonmatchdata = $this->get_simple_cf_data();
+
+        if ($shortname === 'f6') {
+            $matchdata['customfield_f6_editor'] = ['text' => (string)$matchingvalue, 'format' => FORMAT_HTML];
+            $nonmatchdata['customfield_f6_editor'] = ['text' => (string)$nonmatchingvalue, 'format' => FORMAT_HTML];
+        } else {
+            $matchdata['customfield_' . $shortname] = $matchingvalue;
+            $nonmatchdata['customfield_' . $shortname] = $nonmatchingvalue;
+        }
+
+        $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Match',
+        ] + $matchdata));
+        $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'No match',
+        ] + $nonmatchdata));
+
+        $activities = $this->get_filtered_activities(
+            [$course->id],
+            [[
+                'type' => 'customfield',
+                'shortname' => $shortname,
+                'operator' => 1,
+                'value' => $filtervalue,
+            ]]
+        );
+
+        $this->assertCount(1, $activities);
+        $this->assertEquals('Match', $activities[0]['fullname']);
+    }
+
+    /**
+     * Data provider for customfield filters.
+     *
+     * @return array
+     */
+    public static function customfield_filter_provider(): array {
+        return [
+            'text f1' => ['f1', 'needle text', 'other text', 'needle'],
+            'checkbox f2' => ['f2', 1, 0, '1'],
+            'date f3' => ['f3', 1735689600, 946684800, '1,1,1,2024'],
+            'select f5' => ['f5', 2, 1, '2'],
+            'textarea f6' => ['f6', 'needle body', 'unrelated body', 'needle'],
+            'multiselect f4' => ['f4', [1, 2], [3], '2'],
+        ];
+    }
+
 }

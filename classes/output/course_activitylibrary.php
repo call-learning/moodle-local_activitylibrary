@@ -24,7 +24,7 @@
 
 namespace local_activitylibrary\output;
 
-use local_activitylibrary\filters\filter_form;
+use local_activitylibrary\local\filters\filter_form;
 use renderable;
 use renderer_base;
 use templatable;

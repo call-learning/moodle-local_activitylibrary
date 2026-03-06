@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_activitylibrary\filters;
+namespace local_activitylibrary\local\filters;
 
 /**
  * Generic fulltext filter for any entity.

@@ -24,19 +24,14 @@
 namespace local_activitylibrary;
 
 use global_navigation;
-use local_activitylibrary_testcase;
+use local_activitylibrary\test\testcase;
 use moodle_url;
 use navigation_node;
-
-defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-require_once($CFG->dirroot . '/local/activitylibrary/tests/lib.php');
 
 /**
  * Unit tests for plugin lib hooks.
  */
-final class lib_hooks_test extends local_activitylibrary_testcase {
+final class lib_hooks_test extends testcase {
     /**
      * local_activitylibrary_coursemodule_standard_elements returns immediately when disabled.
      *

@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_activitylibrary\filters;
+namespace local_activitylibrary\local\filters;
 
 use ReflectionClass;
 
@@ -43,18 +43,24 @@ class utils {
         foreach (\core_component::get_plugin_types() as $type => $location) {
             $plugins = \core_component::get_plugin_list($type);
             foreach (array_keys($plugins) as $name) {
-                $locationtoscan = "{$location}/{$name}/classes/filters";
-                if (is_dir($locationtoscan)) {
-                    $sources = scandir($locationtoscan);
+                $locationstocheck = [
+                    ['path' => "{$location}/{$name}/classes/local/filters", 'ns' => "\\{$type}_{$name}\\local\\filters\\"],
+                    ['path' => "{$location}/{$name}/classes/filters", 'ns' => "\\{$type}_{$name}\\filters\\"],
+                ];
+                foreach ($locationstocheck as $locationtocheck) {
+                    if (!is_dir($locationtocheck['path'])) {
+                        continue;
+                    }
+                    $sources = scandir($locationtocheck['path']);
                     foreach ($sources as $filename) {
                         if ($filename === 'base.php' || $filename === "." || $filename === "..") {
                             continue;
                         }
                         $sourcename = str_replace('.php', '', $filename);
-                        $classname = "\\{$type}_{$name}\\filters\\{$sourcename}";
+                        $classname = $locationtocheck['ns'] . $sourcename;
                         if (class_exists($classname)) {
                             $reflector = new ReflectionClass($classname);
-                            if ($reflector->isSubclassOf(\local_activitylibrary\filters\base::class)) {
+                            if ($reflector->isSubclassOf(\local_activitylibrary\local\filters\base::class)) {
                                 $classes[$sourcename] = $classname;
                             }
                         }
@@ -85,7 +91,8 @@ class utils {
         $rootfilters = [];
         foreach ($allfilterclasses as $filtersource => $filterclass) {
             if ($filterclass::check_is_righttype($field)) {
-                if (strpos("\\local_activitylibrary\\filters", $filterclass) == 0) {
+                if (strpos($filterclass, "\\local_activitylibrary\\local\\filters\\") === 0 ||
+                        strpos($filterclass, "\\local_activitylibrary\\filters\\") === 0) {
                     $rootfilters[] = $filterclass;
                 } else {
                     $externalfilters[] = $filterclass;

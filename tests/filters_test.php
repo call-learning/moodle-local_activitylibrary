@@ -24,15 +24,8 @@
 namespace local_activitylibrary;
 
 use local_activitylibrary\customfield\coursemodule_handler;
-use local_activitylibrary\locallib\utils;
-use local_activitylibrary_testcase;
-
-defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
-require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
-require_once($CFG->dirroot . '/local/activitylibrary/tests/lib.php');
+use local_activitylibrary\local\utils;
+use local_activitylibrary\test\testcase;
 
 /**
  * Tests for customfields in course modules.
@@ -41,11 +34,11 @@ require_once($CFG->dirroot . '/local/activitylibrary/tests/lib.php');
  * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class filters_test extends local_activitylibrary_testcase {
+final class filters_test extends testcase {
 
     /**
      * Test that we can obtain a single row result for a set of fields for a module.
-     * @covers \local_activitylibrary\locallib\customfield_utils::get_sql_for_entity_customfields
+     * @covers \local_activitylibrary\local\customfield_utils::get_sql_for_entity_customfields
      */
     public function test_flat_sql_coursemodule(): void {
         global $DB;
@@ -68,7 +61,7 @@ final class filters_test extends local_activitylibrary_testcase {
         $activity = $dg->create_module('label', (object)$activitydata);
         $cm = get_coursemodule_from_instance('label', $activity->id, $course->id, false, MUST_EXIST);
 
-        $sqlactivity = \local_activitylibrary\locallib\customfield_utils::get_sql_for_entity_customfields('coursemodule');
+        $sqlactivity = \local_activitylibrary\local\customfield_utils::get_sql_for_entity_customfields('coursemodule');
         $activityrow = $DB->get_records_sql($sqlactivity . ' WHERE e.id = :cmid', ['cmid' => $cm->id]);
         $this->assertCount(1, $activityrow);
         $this->assert_check_simple_cf_data(reset($activityrow));
@@ -76,7 +69,7 @@ final class filters_test extends local_activitylibrary_testcase {
 
     /**
      * Test hidden field helpers with module handler.
-     * @covers \local_activitylibrary\locallib\utils::is_field_hidden_filters
+     * @covers \local_activitylibrary\local\utils::is_field_hidden_filters
      */
     public function test_utils_get_hiddenfields_coursemodule(): void {
         $handler = coursemodule_handler::create();
@@ -86,7 +79,7 @@ final class filters_test extends local_activitylibrary_testcase {
 
     /**
      * Test hide field helpers with module handler.
-     * @covers \local_activitylibrary\locallib\utils::hide_fields_filter
+     * @covers \local_activitylibrary\local\utils::hide_fields_filter
      */
     public function test_utils_set_get_hiddenfields_coursemodule(): void {
         $handler = coursemodule_handler::create();
@@ -102,7 +95,7 @@ final class filters_test extends local_activitylibrary_testcase {
 
     /**
      * Test show field helpers with module handler.
-     * @covers \local_activitylibrary\locallib\utils::show_fields_filter
+     * @covers \local_activitylibrary\local\utils::show_fields_filter
      */
     public function test_utils_show_hiddenfields_coursemodule(): void {
         $handler = coursemodule_handler::create();

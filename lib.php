@@ -55,7 +55,10 @@ function local_activitylibrary_extend_navigation(global_navigation $nav) {
     if (empty($CFG->enableactivitylibrary)) {
         return;
     }
-    list($urltext, $url) = \local_activitylibrary\locallib\utils::get_catalog_url();
+    if ($nav->find('activitylibrary', null)) {
+        return;
+    }
+    list($urltext, $url) = \local_activitylibrary\local\utils::get_catalog_url();
     $mycoursesnode = $nav->find('mycourses', null);
     if ($mycoursesnode) {
         $node = $nav->create($urltext, $url, navigation_node::NODETYPE_LEAF, null, 'activitylibrary',

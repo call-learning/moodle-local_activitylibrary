@@ -15,38 +15,47 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Course static filter.
+ * Module name static filter.
  *
  * @package   local_activitylibrary
  * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_activitylibrary\filters;
+namespace local_activitylibrary\local\filters;
 
 /**
- * Generic course filter.
+ * Generic module type filter.
  *
  * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class course_filter implements activitylibrary_filter_interface, static_filter_interface {
+class modname_filter implements activitylibrary_filter_interface, static_filter_interface {
     /**
      * Add to form.
      *
      * @param \MoodleQuickForm $mform
      * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function add_to_form(\MoodleQuickForm &$mform) {
+        global $DB;
+
         $choices = ['' => get_string('filter:anyvalue', 'local_activitylibrary')];
-        foreach (enrol_get_my_courses(['id', 'fullname'], 'fullname ASC') as $course) {
-            $choices[(int)$course->id] = format_string($course->fullname, true);
+        $stringmanager = get_string_manager();
+        $modulenames = $DB->get_fieldset_select('modules', 'name', '', null, 'name ASC');
+        foreach ($modulenames as $modname) {
+            $component = 'mod_' . $modname;
+            $label = $stringmanager->string_exists('modulename', $component)
+                ? get_string('modulename', $component)
+                : $modname;
+            $choices[$modname] = $label;
         }
 
-        utils::add_filter_operators_to_form($mform, 'course', 'course', self::OPERATOR_EQUAL);
-        $elementname = 'course[value]';
+        utils::add_filter_operators_to_form($mform, 'modname', 'modname', self::OPERATOR_EQUAL);
+        $elementname = 'modname[value]';
         $mform->addElement('select', $elementname, $this->get_label(), $choices);
-        $mform->setType($elementname, PARAM_INT);
+        $mform->setType($elementname, PARAM_ALPHANUMEXT);
     }
 
     /**
@@ -56,7 +65,7 @@ class course_filter implements activitylibrary_filter_interface, static_filter_i
      * @return false|array
      */
     public function check_data($formdata) {
-        $field = 'course';
+        $field = 'modname';
         if (array_key_exists($field, (array)$formdata) && $formdata->$field !== '') {
             return ['value' => (string)$formdata->$field];
         }
@@ -70,7 +79,7 @@ class course_filter implements activitylibrary_filter_interface, static_filter_i
      * @throws \coding_exception
      */
     public function get_label() {
-        return get_string('filter:course', 'local_activitylibrary');
+        return get_string('filter:modname', 'local_activitylibrary');
     }
 
     /**
@@ -80,7 +89,7 @@ class course_filter implements activitylibrary_filter_interface, static_filter_i
      * @return array
      */
     public function get_sql_filter($data) {
-        $courseid = (int)$data;
-        return $courseid > 0 ? ['e.course = :filtercourseid', ['filtercourseid' => $courseid]] : [null, null];
+        $modname = clean_param((string)$data, PARAM_ALPHANUMEXT);
+        return $modname !== '' ? ['m.name = :filtermodname', ['filtermodname' => $modname]] : [null, null];
     }
 }

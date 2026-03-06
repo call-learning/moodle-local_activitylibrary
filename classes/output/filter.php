@@ -25,7 +25,7 @@
 namespace local_activitylibrary\output;
 
 use core_customfield\field_controller;
-use local_activitylibrary\locallib\customfield_utils;
+use local_activitylibrary\local\customfield_utils;
 use renderer_base;
 
 /**
@@ -61,7 +61,7 @@ class filter {
      * @return array Context variables for the template
      */
     public function export_for_template(renderer_base $output) {
-        $filterclass = \local_activitylibrary\filters\utils::get_first_matching_filter($this->field);
+        $filterclass = \local_activitylibrary\local\filters\utils::get_first_matching_filter($this->field);
         $data = [];
         if (class_exists($filterclass)) {
             $name = customfield_utils::get_field_name('customfield_', $this->field->get('shortname'));

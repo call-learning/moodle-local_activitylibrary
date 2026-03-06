@@ -25,7 +25,7 @@
 namespace local_activitylibrary\output;
 
 use core_customfield\output\management;
-use local_activitylibrary\locallib\utils;
+use local_activitylibrary\local\utils;
 
 /**
  *  Custom field management

@@ -23,7 +23,7 @@
  */
 namespace local_activitylibrary;
 use local_activitylibrary\external\get_filtered_activities;
-use local_activitylibrary_testcase;
+use local_activitylibrary\test\testcase;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -31,7 +31,6 @@ global $CFG;
 
 require_once($CFG->dirroot . '/backup/util/includes/backup_includes.php');
 require_once($CFG->dirroot . '/backup/util/includes/restore_includes.php');
-require_once($CFG->dirroot . '/local/activitylibrary/tests/lib.php');
 
 /**
  * Tests for externallib static functions
@@ -40,7 +39,7 @@ require_once($CFG->dirroot . '/local/activitylibrary/tests/lib.php');
  * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-final class api_test extends local_activitylibrary_testcase {
+final class api_test extends testcase {
 
     /**
      * Test that we can retrieve activities for a given course.
@@ -157,6 +156,108 @@ final class api_test extends local_activitylibrary_testcase {
         );
 
         $this->assertEquals('fullname ASC,modname DESC', $sortsql);
+    }
+
+    /**
+     * Test catalogue visibility with role, enrolment scope, and availability constraints.
+     *
+     * @param string $viewer
+     * @param bool $useemptycoursescope
+     * @param array $enrolledcourses
+     * @param array $expectednames
+     * @dataProvider visibility_catalogue_provider
+     * @covers \local_activitylibrary\external\get_filtered_activities::execute
+     * @runInSeparateProcess
+     */
+    public function test_get_filtered_activities_visibility_catalogue(
+        string $viewer,
+        bool $useemptycoursescope,
+        array $enrolledcourses,
+        array $expectednames
+    ): void {
+        $dg = $this->getDataGenerator();
+        $course1 = $dg->create_course(['shortname' => 'C1']);
+        $course2 = $dg->create_course(['shortname' => 'C2']);
+        $coursemap = [
+            'C1' => $course1->id,
+            'C2' => $course2->id,
+        ];
+
+        $dg->create_module('label', (object)([
+            'course' => $course1->id,
+            'name' => 'C1 visible',
+            'visible' => 1,
+        ] + $this->get_simple_cf_data()));
+        $dg->create_module('label', (object)([
+            'course' => $course2->id,
+            'name' => 'C2 visible',
+            'visible' => 1,
+        ] + $this->get_simple_cf_data()));
+
+        $dg->create_module('label', (object)([
+            'course' => $course1->id,
+            'name' => 'C1 hidden',
+            'visible' => 0,
+        ] + $this->get_simple_cf_data()));
+
+        set_config('enableavailability', 1);
+        $dg->create_module('label', (object)([
+            'course' => $course1->id,
+            'name' => 'C1 future',
+            'visible' => 1,
+            'availability' => json_encode(\core_availability\tree::get_root_json([
+                \availability_date\condition::get_json(\availability_date\condition::DIRECTION_FROM, time() + DAYSECS),
+            ])),
+        ] + $this->get_simple_cf_data()));
+
+        if ($viewer === 'student') {
+            $student = $dg->create_user();
+            foreach ($enrolledcourses as $courseshortname) {
+                if (isset($coursemap[$courseshortname])) {
+                    $dg->enrol_user($student->id, $coursemap[$courseshortname], 'student');
+                }
+            }
+            $this->setUser($student);
+        } else {
+            $this->setAdminUser();
+        }
+
+        \course_modinfo::clear_instance_cache();
+
+        $courseids = $useemptycoursescope ? [] : [$course1->id, $course2->id];
+        $activities = get_filtered_activities::execute($courseids);
+        $returnednames = array_column($activities, 'fullname');
+        sort($returnednames);
+        sort($expectednames);
+        $this->assertSame($expectednames, $returnednames);
+    }
+
+    /**
+     * Data provider for catalogue visibility scenarios.
+     *
+     * @return array
+     */
+    public static function visibility_catalogue_provider(): array {
+        return [
+            'Admin with explicit scope sees visible activities in both courses' => [
+                'admin',
+                false,
+                [],
+                ['C1 future', 'C1 visible', 'C2 visible'],
+            ],
+            'Student enrolled in one course only sees that course visible activities' => [
+                'student',
+                true,
+                ['C1'],
+                ['C1 visible'],
+            ],
+            'Student enrolled in both courses still does not see hidden or future activities' => [
+                'student',
+                true,
+                ['C1', 'C2'],
+                ['C1 visible', 'C2 visible'],
+            ],
+        ];
     }
 
 }

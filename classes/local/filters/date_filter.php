@@ -15,22 +15,35 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Simple value select filter. A variant of the user_filter_simpleselect.
+ * Date filter. A variant of the user_filter_simpleselect.
  *
  * @package   local_activitylibrary
  * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_activitylibrary\filters;
+namespace local_activitylibrary\local\filters;
+
+use DateTime;
 
 /**
- * Generic filter based on a list of values.
+ * Date filter
  *
  * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class select_filter extends baseselect_filter {
+class date_filter extends base {
+    /**
+     * Constructor
+     *
+     * @param \core_customfield\field_controller $field user table filed name
+     * @throws \moodle_exception
+     */
+    public function __construct(\core_customfield\field_controller $field) {
+        parent::__construct($field);
+        $this->_operator = self::OPERATOR_GREATERTHAN;
+    }
+
     /**
      * Check if this is the right type for this handler
      *
@@ -39,32 +52,30 @@ class select_filter extends baseselect_filter {
      * @throws \moodle_exception
      */
     public static function check_is_righttype(\core_customfield\field_controller $field) {
-        return $field instanceof \customfield_select\field_controller;
+        return $field instanceof \customfield_date\field_controller;
     }
 
     /**
      * Adds controls specific to this filter in the form.
      *
      * @param \MoodleQuickForm $mform
-     *
      * @throws \coding_exception
      */
     public function add_to_form(\MoodleQuickForm &$mform) {
         $elementname = $this->get_form_value_item_name();
-        $choices = ['' => get_string('filter:anyvalue', 'local_activitylibrary')] + $this->_options;
-        $mform->addElement('select', $elementname, $this->_label, $choices);
+        $mform->addElement('date_selector', $elementname, $this->_label, ['optional' => true]);
         $mform->setType($elementname, $this->get_param_type());
         parent::add_to_form($mform);
     }
 
     /**
      * Return the expected param type for cleaning up the value.
-     *
      * @return mixed
      */
     public function get_param_type() {
         return PARAM_INT;
     }
+
 
     /**
      * Retrieves data from the form data
@@ -90,9 +101,13 @@ class select_filter extends baseselect_filter {
      */
     public function get_sql_filter($data) {
         static $counter = 0;
-        $name = 'ex_simpleselect' . $counter++;
+        $name = 'ex_date' . $counter++;
 
+        $value = substr($data, 2);
+        // The provided value is 1,day,month,year (1 is for enabled).
+        $timestamp = DateTime::createFromFormat('j,m,Y', $value)->getTimestamp();
         $field = $this->get_sql_field_name();
-        return empty($data) ? [null, null] : ["$field=:$name", [$name => $data]];
+        $sqloperator = '>';
+        return empty($value) ? [null, null] : ["$field $sqloperator :$name", [$name => $timestamp]];
     }
 }

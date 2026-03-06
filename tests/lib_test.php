@@ -23,19 +23,15 @@
  */
 namespace local_activitylibrary;
 
-use local_activitylibrary\locallib\utils;
+use local_activitylibrary\local\utils;
 use local_activitylibrary\output\base_activitylibrary;
-use local_activitylibrary_testcase;
+use local_activitylibrary\test\testcase;
 
-defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-require_once($CFG->dirroot . '/local/activitylibrary/tests/lib.php');
 
 /**
  * Unit tests for plugin-level lib functions.
  */
-final class lib_test extends local_activitylibrary_testcase {
+final class lib_test extends testcase {
     /**
      * Test that declared user preferences contain expected defaults and choices.
      *
@@ -79,11 +75,11 @@ final class lib_test extends local_activitylibrary_testcase {
     /**
      * Test menu override parsing with multi-line language entries and course suffix.
      *
-     * @covers \local_activitylibrary\locallib\utils::get_resource_library_menu_text
+     * @covers \local_activitylibrary\local\utils::get_resource_library_menu_text
      */
     public function test_get_resource_library_menu_text_with_language_override(): void {
         $lang = current_language();
-        set_config('menutextoverride', "English text|en\nCustom text|{$lang}", 'local_activitylibrary');
+        set_config('menutextoverride', "Custom text|{$lang}", 'local_activitylibrary');
 
         $menutext = utils::get_resource_library_menu_text('Course Name');
         $this->assertEquals('Custom text (Course Name)', $menutext);

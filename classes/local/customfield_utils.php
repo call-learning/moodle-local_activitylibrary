@@ -22,11 +22,11 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_activitylibrary\locallib;
+namespace local_activitylibrary\local;
 
 use core_customfield\field_controller;
 use core_customfield\handler;
-use local_activitylibrary\locallib\utils;
+use local_activitylibrary\local\utils;
 
 /**
  * Class customfield_utils
@@ -147,7 +147,7 @@ class customfield_utils {
      * @return mixed|null
      */
     public static function get_filter_from_field($field) {
-        $filterclass = \local_activitylibrary\filters\utils::get_first_matching_filter($field);
+        $filterclass = \local_activitylibrary\local\filters\utils::get_first_matching_filter($field);
         if (class_exists($filterclass)) {
             $filter = new $filterclass($field);
             return $filter;

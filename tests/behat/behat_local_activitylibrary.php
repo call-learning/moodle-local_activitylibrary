@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use local_activitylibrary\locallib\utils;
+use local_activitylibrary\local\utils;
 use Moodle\BehatExtension\Exception\SkippedException;
 
 require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');

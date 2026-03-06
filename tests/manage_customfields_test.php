@@ -24,18 +24,14 @@
 namespace local_activitylibrary;
 
 use local_activitylibrary\external\manage_customfields;
-use local_activitylibrary\locallib\utils;
-use local_activitylibrary_testcase;
+use local_activitylibrary\local\utils;
+use local_activitylibrary\test\testcase;
 
-defined('MOODLE_INTERNAL') || die();
-
-global $CFG;
-require_once($CFG->dirroot . '/local/activitylibrary/tests/lib.php');
 
 /**
  * Unit tests for manage_customfields external methods.
  */
-final class manage_customfields_test extends local_activitylibrary_testcase {
+final class manage_customfields_test extends testcase {
     /**
      * Reset static hidden fields cache between assertions.
      */
@@ -51,6 +47,7 @@ final class manage_customfields_test extends local_activitylibrary_testcase {
      * @covers \local_activitylibrary\external\manage_customfields::hide_fields_filter
      * @covers \local_activitylibrary\external\manage_customfields::show_fields_filter
      * @covers \local_activitylibrary\external\manage_customfields::get_hidden_fields_filters
+     * @runInSeparateProcess
      */
     public function test_manage_customfields_hide_show_cycle(): void {
         $this->reset_hiddenfields_cache();
@@ -67,4 +64,3 @@ final class manage_customfields_test extends local_activitylibrary_testcase {
         $this->assertEquals(['f2'], array_values($hidden));
     }
 }
-

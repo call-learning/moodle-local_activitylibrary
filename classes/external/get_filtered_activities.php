@@ -32,7 +32,7 @@ use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
-use local_activitylibrary\locallib\customfield_utils;
+use local_activitylibrary\local\customfield_utils;
 use moodle_url;
 
 /**
@@ -61,7 +61,7 @@ class get_filtered_activities extends external_api {
                             'shortname' => new external_value(PARAM_ALPHANUMEXT,
                                 'Matching customfield shortname if it is a customfield filter', VALUE_OPTIONAL),
                             'operator' => new external_value(PARAM_INT,
-                                'Filter option as per local_activitylibrary\\filters options.'),
+                                'Filter option as per local_activitylibrary\\local\\filters options.'),
                             'value' => new external_value(PARAM_RAW, 'The value of the filter to look for.'),
                         ]
                     ),

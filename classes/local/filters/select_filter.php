@@ -15,22 +15,33 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Simple text/textarea filter. A variant of the user_filter_simpleselect.
+ * Simple value select filter. A variant of the user_filter_simpleselect.
  *
  * @package   local_activitylibrary
  * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_activitylibrary\filters;
+namespace local_activitylibrary\local\filters;
 
 /**
- * Generic filter based on a text content
+ * Generic filter based on a list of values.
  *
  * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class basetext_filter extends base {
+class select_filter extends baseselect_filter {
+    /**
+     * Check if this is the right type for this handler
+     *
+     * @param \core_customfield\field_controller $field
+     * @return bool
+     * @throws \moodle_exception
+     */
+    public static function check_is_righttype(\core_customfield\field_controller $field) {
+        return $field instanceof \customfield_select\field_controller;
+    }
+
     /**
      * Adds controls specific to this filter in the form.
      *
@@ -40,18 +51,19 @@ abstract class basetext_filter extends base {
      */
     public function add_to_form(\MoodleQuickForm &$mform) {
         $elementname = $this->get_form_value_item_name();
-        $mform->addElement( 'text', $elementname, $this->_label, 'size=' . (int)
-            $this->_field->get_configdata_property('displaysize'));
+        $choices = ['' => get_string('filter:anyvalue', 'local_activitylibrary')] + $this->_options;
+        $mform->addElement('select', $elementname, $this->_label, $choices);
         $mform->setType($elementname, $this->get_param_type());
         parent::add_to_form($mform);
     }
 
     /**
      * Return the expected param type for cleaning up the value.
+     *
      * @return mixed
      */
     public function get_param_type() {
-        return PARAM_TEXT;
+        return PARAM_INT;
     }
 
     /**
@@ -62,9 +74,11 @@ abstract class basetext_filter extends base {
      */
     public function check_data($formdata) {
         $field = $this->_name;
+
         if (array_key_exists($field, (array) $formdata) && $formdata->$field !== '') {
             return ['value' => (string) $formdata->$field];
         }
+
         return false;
     }
 
@@ -75,13 +89,10 @@ abstract class basetext_filter extends base {
      * @return array sql string and $params (or array (null, null) if no filter)
      */
     public function get_sql_filter($data) {
-        global $DB;
         static $counter = 0;
-        $name = 'ex_textfilter' . $counter++;
+        $name = 'ex_simpleselect' . $counter++;
 
         $field = $this->get_sql_field_name();
-        return empty($data) ? [null, null] : [
-            $DB->sql_like($field, ":$name", false),
-            [$name => "%$data%"], ];
+        return empty($data) ? [null, null] : ["$field=:$name", [$name => $data]];
     }
 }

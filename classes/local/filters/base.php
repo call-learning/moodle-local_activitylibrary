@@ -22,9 +22,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_activitylibrary\filters;
+namespace local_activitylibrary\local\filters;
 
-use local_activitylibrary\locallib\customfield_utils;
+use local_activitylibrary\local\customfield_utils;
 
 /**
  * Generic base filter for all other filters.

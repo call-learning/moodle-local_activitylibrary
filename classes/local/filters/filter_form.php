@@ -22,10 +22,10 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_activitylibrary\filters;
+namespace local_activitylibrary\local\filters;
 
-use local_activitylibrary\locallib\customfield_utils;
-use local_activitylibrary\locallib\utils;
+use local_activitylibrary\local\customfield_utils;
+use local_activitylibrary\local\utils;
 
 defined('MOODLE_INTERNAL') || die;
 global $CFG;
@@ -50,9 +50,9 @@ class filter_form extends \moodleform {
 
         // Add static filters (like fulltext search).
         $staticfilters = [
-            'local_activitylibrary\filters\fulltext_filter',
-            'local_activitylibrary\filters\course_filter',
-            'local_activitylibrary\filters\modname_filter',
+            'local_activitylibrary\local\filters\fulltext_filter',
+            'local_activitylibrary\local\filters\course_filter',
+            'local_activitylibrary\local\filters\modname_filter',
         ];
         foreach ($staticfilters as $filterclass) {
             if (class_exists($filterclass)) {

@@ -15,22 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Simple value select filter. A variant of the user_filter_simpleselect
+ * Simple value select filter. A variant of the user_filter_simpleselect.
  *
  * @package   local_activitylibrary
  * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_activitylibrary\filters;
+namespace local_activitylibrary\local\filters;
 
 /**
- * Generic filter based on a simple checkbox
+ * Generic filter based on a list of values.
  *
  * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class checkbox_filter extends base {
+class multiselect_filter extends baseselect_filter {
 
     /**
      * Check if this is the right type for this handler
@@ -40,10 +40,9 @@ class checkbox_filter extends base {
      * @throws \moodle_exception
      */
     public static function check_is_righttype(\core_customfield\field_controller $field) {
-        return $field instanceof \customfield_checkbox\field_controller;
+        return \local_activitylibrary\local\utils::is_multiselect_installed()
+                && $field instanceof \customfield_multiselect\field_controller;
     }
-
-
     /**
      * Adds controls specific to this filter in the form.
      *
@@ -52,20 +51,23 @@ class checkbox_filter extends base {
      * @throws \coding_exception
      */
     public function add_to_form(\MoodleQuickForm &$mform) {
+        $choices = $this->_options;
         $elementname = $this->get_form_value_item_name();
-        $mform->addElement( 'checkbox', $elementname, $this->_label);
-        $mform->setDefault($elementname, $this->_field->get_configdata_property('checkbydefault'));
+        $mform->addElement('searchableselector',
+            $elementname,
+            $this->_label,
+            $choices,
+            ['multiple' => true]);
         $mform->setType($elementname, $this->get_param_type());
-        parent::add_to_form($mform);
+        base::add_to_form($mform);
     }
-
 
     /**
      * Return the expected param type for cleaning up the value.
      * @return mixed
      */
     public function get_param_type() {
-        return PARAM_BOOL;
+        return PARAM_RAW;
     }
 
     /**
@@ -77,7 +79,7 @@ class checkbox_filter extends base {
     public function check_data($formdata) {
         $field = $this->_name;
 
-        if (array_key_exists($field,  (array) $formdata) && $formdata->$field !== '') {
+        if (array_key_exists($field, (array) $formdata) && $formdata->$field !== '') {
             return ['value' => (string) $formdata->$field];
         }
 
@@ -92,10 +94,34 @@ class checkbox_filter extends base {
      */
     public function get_sql_filter($data) {
         static $counter = 0;
-        $name = 'ex_checkbox' . $counter++;
+        $likes = [
+            (object) ['operator' => ' = :%s ', 'value' => '%s'],
+            (object) ['operator' => ' LIKE(:%s)', 'value' => '%s,%%'],
+            (object) ['operator' => ' LIKE(:%s)', 'value' => '%%,%s'],
+            (object) ['operator' => ' LIKE(:%s)', 'value' => '%%,%s,%%'],
+        ];
+        $name = 'ex_multiselect' . $counter++;
 
+        if (!isset($data)) {
+            return [null, null];
+        }
+        $values = explode(',', $data);
+
+        $paramcount = 0;
         $field = $this->get_sql_field_name();
-        return empty($data) ? [null, null] : ["$field=:$name", [$name => $data]];
+        $comparisonstring = "";
+        $comparisonparams = [];
+        foreach ($values as $v) {
+            foreach ($likes as $like) {
+                $currentname = $name . '_' . $paramcount;
+                $comparisonstring .= ($comparisonstring ? " OR " : " ") . $field . sprintf($like->operator, $currentname);
+                $comparisonparams[$currentname] = sprintf($like->value, $v);
+                $paramcount++;
+            }
+        }
+        $comparisonarray = ["($comparisonstring)", $comparisonparams];
+
+        return empty($values) ? [null, null] : $comparisonarray;
     }
 }
 

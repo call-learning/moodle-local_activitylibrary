@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Simple text filter. A variant of the simpletext_filter
+ * Simple textarea filter. A variant of the simpletext_filter.
  *
  * @package   local_activitylibrary
  * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_activitylibrary\filters;
+namespace local_activitylibrary\local\filters;
 
 /**
  * Generic filter based on a text content
@@ -30,7 +30,7 @@ namespace local_activitylibrary\filters;
  * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class text_filter extends basetext_filter {
+class textarea_filter extends basetext_filter {
     /**
      * Check if this is the right type for this handler
      *
@@ -39,6 +39,6 @@ class text_filter extends basetext_filter {
      * @throws \moodle_exception
      */
     public static function check_is_righttype(\core_customfield\field_controller $field) {
-        return $field instanceof \customfield_text\field_controller;
+        return $field instanceof \customfield_textarea\field_controller;
     }
 }

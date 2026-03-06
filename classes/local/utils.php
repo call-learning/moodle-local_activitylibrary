@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_activitylibrary\locallib;
+namespace local_activitylibrary\local;
 
 use core_customfield\handler;
 use local_activitylibrary\customfield\course_handler;

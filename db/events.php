@@ -26,10 +26,10 @@ defined('MOODLE_INTERNAL') || die;
 $observers = [
     [
         'eventname' => '\core\event\course_deleted',
-        'callback' => '\local_activitylibrary\observer\eventmanager::course_deleted',
+        'callback' => '\local_activitylibrary\local\observer\eventmanager::course_deleted',
     ],
     [
         'eventname' => '\core\event\course_created',
-        'callback' => '\local_activitylibrary\observer\eventmanager::course_created',
+        'callback' => '\local_activitylibrary\local\observer\eventmanager::course_created',
     ],
 ];

@@ -15,43 +15,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Simple value select filter. A variant of the user_filter_simpleselect.
+ * Activity Library Filter Interface
  *
  * @package   local_activitylibrary
  * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_activitylibrary\filters;
+namespace local_activitylibrary\local\filters;
 
 /**
- * Generic filter based on a list of values.
+ * Interface used as a marker for static filters.
  *
  * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-abstract class baseselect_filter extends base {
-    /**
-     * options for the list values
-     *
-     * @var array
-     */
-    protected $_options;
-
-    /**
-     * Constructor
-     *
-     * @param \core_customfield\field_controller $field user table filed name
-     * @throws \moodle_exception
-     */
-    public function __construct(\core_customfield\field_controller $field) {
-        parent::__construct($field);
-        $options = $field->get_options(); // TODO: MDL-0 this could be a non static method.
-        $this->_options = [];
-        $context = $field->get_handler()->get_configuration_context();
-        foreach ($options as $key => $option) {
-            // Multilang formatting with filters.
-            $this->_options[$key] = format_string($option, true, ['context' => $context]);
-        }
-    }
+interface static_filter_interface {
 }

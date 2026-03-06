@@ -15,34 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Simple value select filter. A variant of the user_filter_simpleselect.
+ * Simple text/textarea filter. A variant of the user_filter_simpleselect.
  *
  * @package   local_activitylibrary
  * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_activitylibrary\filters;
+namespace local_activitylibrary\local\filters;
 
 /**
- * Generic filter based on a list of values.
+ * Generic filter based on a text content
  *
  * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class multiselect_filter extends baseselect_filter {
-
-    /**
-     * Check if this is the right type for this handler
-     *
-     * @param \core_customfield\field_controller $field
-     * @return bool
-     * @throws \moodle_exception
-     */
-    public static function check_is_righttype(\core_customfield\field_controller $field) {
-        return \local_activitylibrary\locallib\utils::is_multiselect_installed()
-                && $field instanceof \customfield_multiselect\field_controller;
-    }
+abstract class basetext_filter extends base {
     /**
      * Adds controls specific to this filter in the form.
      *
@@ -51,15 +39,11 @@ class multiselect_filter extends baseselect_filter {
      * @throws \coding_exception
      */
     public function add_to_form(\MoodleQuickForm &$mform) {
-        $choices = $this->_options;
         $elementname = $this->get_form_value_item_name();
-        $mform->addElement('searchableselector',
-            $elementname,
-            $this->_label,
-            $choices,
-            ['multiple' => true]);
+        $mform->addElement( 'text', $elementname, $this->_label, 'size=' . (int)
+            $this->_field->get_configdata_property('displaysize'));
         $mform->setType($elementname, $this->get_param_type());
-        base::add_to_form($mform);
+        parent::add_to_form($mform);
     }
 
     /**
@@ -67,7 +51,7 @@ class multiselect_filter extends baseselect_filter {
      * @return mixed
      */
     public function get_param_type() {
-        return PARAM_RAW;
+        return PARAM_TEXT;
     }
 
     /**
@@ -78,11 +62,9 @@ class multiselect_filter extends baseselect_filter {
      */
     public function check_data($formdata) {
         $field = $this->_name;
-
         if (array_key_exists($field, (array) $formdata) && $formdata->$field !== '') {
             return ['value' => (string) $formdata->$field];
         }
-
         return false;
     }
 
@@ -93,35 +75,13 @@ class multiselect_filter extends baseselect_filter {
      * @return array sql string and $params (or array (null, null) if no filter)
      */
     public function get_sql_filter($data) {
+        global $DB;
         static $counter = 0;
-        $likes = [
-            (object) ['operator' => ' = :%s ', 'value' => '%s'],
-            (object) ['operator' => ' LIKE(:%s)', 'value' => '%s,%%'],
-            (object) ['operator' => ' LIKE(:%s)', 'value' => '%%,%s'],
-            (object) ['operator' => ' LIKE(:%s)', 'value' => '%%,%s,%%'],
-        ];
-        $name = 'ex_multiselect' . $counter++;
+        $name = 'ex_textfilter' . $counter++;
 
-        if (!isset($data)) {
-            return [null, null];
-        }
-        $values = explode(',', $data);
-
-        $paramcount = 0;
         $field = $this->get_sql_field_name();
-        $comparisonstring = "";
-        $comparisonparams = [];
-        foreach ($values as $v) {
-            foreach ($likes as $like) {
-                $currentname = $name . '_' . $paramcount;
-                $comparisonstring .= ($comparisonstring ? " OR " : " ") . $field . sprintf($like->operator, $currentname);
-                $comparisonparams[$currentname] = sprintf($like->value, $v);
-                $paramcount++;
-            }
-        }
-        $comparisonarray = ["($comparisonstring)", $comparisonparams];
-
-        return empty($values) ? [null, null] : $comparisonarray;
+        return empty($data) ? [null, null] : [
+            $DB->sql_like($field, ":$name", false),
+            [$name => "%$data%"], ];
     }
 }
-

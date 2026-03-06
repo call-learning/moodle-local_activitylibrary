@@ -56,7 +56,7 @@ $PAGE->add_body_class('resource-library-activities');
 
 $site = get_site();
 
-$stractivitylibrary = \local_activitylibrary\locallib\utils::get_resource_library_menu_text();
+$stractivitylibrary = \local_activitylibrary\local\utils::get_resource_library_menu_text();
 
 $pagedesc = $stractivitylibrary;
 $title = $stractivitylibrary;

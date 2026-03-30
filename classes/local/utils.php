@@ -35,10 +35,111 @@ use Matrix\Exception;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class utils {
+    /** @var int Activity visible in catalogue. */
+    public const ITEM_VISIBLE = 0;
+
+    /** @var int Activity hidden from catalogue. */
+    public const ITEM_HIDDEN = 1;
+
     /**
      * @var array $hiddenfields
      */
     private static $hiddenfields = null;
+
+    /**
+     * Parse a comma-separated config value into unique positive integer IDs.
+     *
+     * @param string|null $configvalue
+     * @return array
+     */
+    protected static function parse_configured_ids(?string $configvalue): array {
+        if (!$configvalue) {
+            return [];
+        }
+
+        $ids = preg_split('/[\s,]+/', $configvalue);
+        $ids = array_map('intval', $ids);
+        $ids = array_filter($ids, function(int $id): bool {
+            return $id > 0;
+        });
+
+        return array_values(array_unique($ids));
+    }
+
+    /**
+     * Get course IDs hidden from the activity library.
+     *
+     * @return array
+     */
+    public static function get_hidden_course_ids(): array {
+        return self::parse_configured_ids(get_config('local_activitylibrary', 'hiddencoursesid'));
+    }
+
+    /**
+     * Get activity IDs hidden from the activity library.
+     *
+     * @return array
+     */
+    public static function get_hidden_activity_ids(): array {
+        global $DB;
+
+        $dbman = $DB->get_manager();
+        if (!$dbman->table_exists('local_activitylibrary_status')) {
+            return [];
+        }
+
+        $records = $DB->get_records('local_activitylibrary_status', ['visibility' => self::ITEM_HIDDEN], '', 'coursemoduleid');
+        $ids = array_map(function(\stdClass $record): int {
+            return (int)$record->coursemoduleid;
+        }, $records);
+
+        return array_values(array_unique($ids));
+    }
+
+    /**
+     * Check whether an activity is hidden from the catalogue.
+     *
+     * @param int $coursemoduleid
+     * @return bool
+     */
+    public static function is_activity_hidden_from_catalogue(int $coursemoduleid): bool {
+        return in_array($coursemoduleid, self::get_hidden_activity_ids());
+    }
+
+    /**
+     * Persist activity catalogue visibility in the dedicated table.
+     *
+     * @param int $coursemoduleid
+     * @param bool $hidden
+     * @return void
+     */
+    public static function set_activity_hidden_from_catalogue(int $coursemoduleid, bool $hidden): void {
+        global $DB;
+
+        $existing = $DB->get_record('local_activitylibrary_status', ['coursemoduleid' => $coursemoduleid]);
+        if (!$hidden) {
+            if ($existing) {
+                $DB->delete_records('local_activitylibrary_status', ['id' => $existing->id]);
+            }
+            return;
+        }
+
+        $record = (object)[
+            'coursemoduleid' => $coursemoduleid,
+            'visibility' => self::ITEM_HIDDEN,
+            'timemodified' => time(),
+        ];
+
+        if ($existing) {
+            $record->id = $existing->id;
+            $record->timecreated = $existing->timecreated;
+            $DB->update_record('local_activitylibrary_status', $record);
+            return;
+        }
+
+        $record->timecreated = time();
+        $DB->insert_record('local_activitylibrary_status', $record);
+    }
 
     /**
      * Get Activity library URL and text description for the current page

@@ -81,4 +81,76 @@ final class utils_test extends testcase {
         $this->assertInstanceOf(\moodle_url::class, $url);
         $this->assertStringContainsString('/local/activitylibrary/index.php', $url->out(false));
     }
+
+    /**
+     * Test configured hidden course IDs are parsed from CSV.
+     *
+     * @covers \local_activitylibrary\local\utils::get_hidden_course_ids
+     */
+    public function test_get_hidden_course_ids_from_csv_config(): void {
+        set_config('hiddencoursesid', ' 12, 7,0,12, abc, 4 ', 'local_activitylibrary');
+
+        $hiddenids = utils::get_hidden_course_ids();
+
+        $this->assertSame([12, 7, 4], $hiddenids);
+    }
+
+    /**
+     * Test hidden activity IDs are read from the dedicated visibility table.
+     *
+     * @covers \local_activitylibrary\local\utils::get_hidden_activity_ids
+     * @covers \local_activitylibrary\local\utils::set_activity_hidden_from_catalogue
+     */
+    public function test_get_hidden_activity_ids_from_visibility_table(): void {
+        $dg = $this->getDataGenerator();
+        $course = $dg->create_course();
+        $activity1 = $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Hidden 1',
+        ] + $this->get_simple_cf_data()));
+        $activity2 = $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Hidden 2',
+        ] + $this->get_simple_cf_data()));
+
+        $cm1 = get_coursemodule_from_instance('label', $activity1->id, $course->id, false, MUST_EXIST);
+        $cm2 = get_coursemodule_from_instance('label', $activity2->id, $course->id, false, MUST_EXIST);
+
+        utils::set_activity_hidden_from_catalogue((int)$cm1->id, true);
+        utils::set_activity_hidden_from_catalogue((int)$cm2->id, true);
+
+        $hiddenids = utils::get_hidden_activity_ids();
+
+        sort($hiddenids);
+        $this->assertSame([(int)$cm1->id, (int)$cm2->id], $hiddenids);
+    }
+
+    /**
+     * Test hidden activity status records use class constants and are removed when unhidden.
+     *
+     * @covers \local_activitylibrary\local\utils::set_activity_hidden_from_catalogue
+     * @covers \local_activitylibrary\local\utils::is_activity_hidden_from_catalogue
+     */
+    public function test_set_activity_hidden_from_catalogue_persists_and_removes_status_record(): void {
+        global $DB;
+
+        $dg = $this->getDataGenerator();
+        $course = $dg->create_course();
+        $activity = $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Visibility status target',
+        ] + $this->get_simple_cf_data()));
+        $cm = get_coursemodule_from_instance('label', $activity->id, $course->id, false, MUST_EXIST);
+
+        utils::set_activity_hidden_from_catalogue((int)$cm->id, true);
+
+        $record = $DB->get_record('local_activitylibrary_status', ['coursemoduleid' => $cm->id], '*', MUST_EXIST);
+        $this->assertSame(utils::ITEM_HIDDEN, (int)$record->visibility);
+        $this->assertTrue(utils::is_activity_hidden_from_catalogue((int)$cm->id));
+
+        utils::set_activity_hidden_from_catalogue((int)$cm->id, false);
+
+        $this->assertFalse($DB->record_exists('local_activitylibrary_status', ['coursemoduleid' => $cm->id]));
+        $this->assertFalse(utils::is_activity_hidden_from_catalogue((int)$cm->id));
+    }
 }

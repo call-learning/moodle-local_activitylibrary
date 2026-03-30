@@ -34,6 +34,7 @@ use core_external\external_multiple_structure;
 use core_external\external_single_structure;
 use core_external\external_value;
 use local_activitylibrary\local\customfield_utils;
+use local_activitylibrary\local\utils;
 use moodle_url;
 
 /**
@@ -138,6 +139,11 @@ class get_filtered_activities extends external_api {
             return [];
         }
 
+        $scopeids = array_values(array_diff($scopeids, utils::get_hidden_course_ids()));
+        if (empty($scopeids)) {
+            return [];
+        }
+
         $customfieldfilters = [];
         $selectedcourseids = [];
         $selectedmodules = [];
@@ -170,6 +176,8 @@ class get_filtered_activities extends external_api {
             }
         }
 
+        $hiddenactivityids = utils::get_hidden_activity_ids();
+
         [$insql, $inparams] = $DB->get_in_or_equal($scopeids, SQL_PARAMS_NAMED, 'courseid');
         $sqlparams = $inparams;
         $sqlwhere = "e.course {$insql} AND e.visible = 1";
@@ -179,6 +187,12 @@ class get_filtered_activities extends external_api {
             [$modinsql, $modinparams] = $DB->get_in_or_equal($selectedmodules, SQL_PARAMS_NAMED, 'modname');
             $sqlwhere .= " AND m.name {$modinsql}";
             $sqlparams += $modinparams;
+        }
+
+        if (!empty($hiddenactivityids)) {
+            [$hiddeninsql, $hiddeninparams] = $DB->get_in_or_equal($hiddenactivityids, SQL_PARAMS_NAMED, 'hiddenactivity', false);
+            $sqlwhere .= " AND e.id {$hiddeninsql}";
+            $sqlparams += $hiddeninparams;
         }
 
         $additionalfields = [

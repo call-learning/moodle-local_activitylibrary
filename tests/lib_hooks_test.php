@@ -24,6 +24,7 @@
 namespace local_activitylibrary;
 
 use global_navigation;
+use local_activitylibrary\local\utils;
 use local_activitylibrary\test\testcase;
 use moodle_url;
 use navigation_node;
@@ -166,5 +167,36 @@ final class lib_hooks_test extends testcase {
         $result = \local_activitylibrary_coursemodule_edit_post_actions($data, (object)['id' => 1]);
         $this->assertSame($data, $result);
         $this->assertFalse(property_exists($result, 'id'));
+    }
+
+    /**
+     * Edit post actions persist activity catalogue visibility in the dedicated table.
+     *
+     * @covers ::local_activitylibrary_coursemodule_edit_post_actions
+     */
+    public function test_coursemodule_edit_post_actions_persists_hidden_flag(): void {
+        global $CFG;
+        $CFG->enableactivitylibrary = 1;
+
+        $dg = $this->getDataGenerator();
+        $course = $dg->create_course();
+        $activity = $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Visibility target',
+        ] + $this->get_simple_cf_data()));
+        $cm = get_coursemodule_from_instance('label', $activity->id, $course->id, false, MUST_EXIST);
+
+        $data = (object)[
+            'coursemodule' => $cm->id,
+            'activitylibraryhiddenfromcatalogue' => 1,
+            'update' => 1,
+        ];
+
+        \local_activitylibrary_coursemodule_edit_post_actions($data, $course);
+        $this->assertTrue(utils::is_activity_hidden_from_catalogue((int)$cm->id));
+
+        $data->activitylibraryhiddenfromcatalogue = 0;
+        \local_activitylibrary_coursemodule_edit_post_actions($data, $course);
+        $this->assertFalse(utils::is_activity_hidden_from_catalogue((int)$cm->id));
     }
 }

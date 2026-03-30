@@ -70,6 +70,7 @@ $string['filters'] = 'Filters';
 $string['fulltext'] = 'Search by text';
 $string['hiddenfromstudents'] = 'Closed';
 $string['hidefromcatalogue'] = 'Hide from catalogue';
+$string['hidefromcatalogue_help'] = 'If enabled, this activity will not appear in the activity library.';
 $string['lastmodification'] = 'Last modification';
 $string['lastmodification:desc'] = 'Last modification (Descending)';
 $string['list'] = 'List';

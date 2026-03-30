@@ -41,6 +41,13 @@ if ($hassiteconfig) {
         empty($CFG->enableactivitylibrary)
     );
 
+    $mainsettings->add(new admin_setting_configtext(
+        'local_activitylibrary/hiddencoursesid',
+        get_string('activitylibrary:hiddencoursesid', 'local_activitylibrary'),
+        get_string('activitylibrary:hiddencoursesid:desc', 'local_activitylibrary'),
+        ''
+    ));
+
     $samplemenutext = '';
     $stringmanager = get_string_manager();
     foreach (['en', 'fr'] as $lang) {

@@ -161,6 +161,46 @@ final class get_filtered_activities_test extends testcase {
     }
 
     /**
+     * Test hidden courses and hidden activities are excluded.
+     *
+     * @covers \local_activitylibrary\external\get_filtered_activities::execute
+     * @runInSeparateProcess
+     */
+    public function test_get_filtered_activities_honours_hidden_ids_settings(): void {
+        $dg = $this->getDataGenerator();
+        $coursehidden = $dg->create_course(['fullname' => 'Hidden course']);
+        $coursevisible = $dg->create_course(['fullname' => 'Visible course']);
+
+        $dg->create_module('label', (object)([
+            'course' => $coursehidden->id,
+            'name' => 'Activity in hidden course',
+        ] + $this->get_simple_cf_data()));
+
+        $hiddenactivity = $dg->create_module('label', (object)([
+            'course' => $coursevisible->id,
+            'name' => 'Hidden activity',
+        ] + $this->get_simple_cf_data()));
+
+        $visibleactivity = $dg->create_module('label', (object)([
+            'course' => $coursevisible->id,
+            'name' => 'Visible activity',
+        ] + $this->get_simple_cf_data()));
+
+        $hiddencm = get_coursemodule_from_instance('label', $hiddenactivity->id, $coursevisible->id, false, MUST_EXIST);
+        $visiblecm = get_coursemodule_from_instance('label', $visibleactivity->id, $coursevisible->id, false, MUST_EXIST);
+
+        set_config('hiddencoursesid', (string)$coursehidden->id, 'local_activitylibrary');
+        \local_activitylibrary\local\utils::set_activity_hidden_from_catalogue((int)$hiddencm->id, true);
+
+        $activities = $this->get_filtered_activities([$coursehidden->id, $coursevisible->id]);
+
+        $this->assertCount(1, $activities);
+        $this->assertEquals('Visible activity', $activities[0]['fullname']);
+        $this->assertEquals($coursevisible->id, $activities[0]['parentid']);
+        $this->assertSame((int)$visiblecm->id, (int)$activities[0]['id']);
+    }
+
+    /**
      * Test that invalid sort entries are ignored in SQL.
      *
      * @covers \local_activitylibrary\external\get_filtered_activities::get_sort_options_sql

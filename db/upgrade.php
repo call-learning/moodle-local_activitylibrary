@@ -36,5 +36,26 @@ function xmldb_local_activitylibrary_upgrade($oldversion) {
 
     $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
 
+    if ($oldversion < 2026033001) {
+        $table = new xmldb_table('local_activitylibrary_status');
+
+        if (!$dbman->table_exists($table)) {
+            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+            $table->add_field('coursemoduleid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+            $table->add_field('visibility', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1');
+            $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+            $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+            $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+            $table->add_key('activitymodulefk', XMLDB_KEY_FOREIGN, ['coursemoduleid'], 'course_modules', ['id']);
+
+            $table->add_index('visibility_ix', XMLDB_INDEX_NOTUNIQUE, ['visibility']);
+
+            $dbman->create_table($table);
+        }
+
+        upgrade_plugin_savepoint(true, 2026033001, 'local', 'activitylibrary');
+    }
+
     return true;
 }

@@ -22,12 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
-define("LOCAL_ACTIVITYLIBRARY_ITEM_VISIBLE", 0);
-define("LOCAL_ACTIVITYLIBRARY_ITEM_HIDDEN", 1);
-
-
-
 /**
  * Nothing for now
  */
@@ -127,11 +121,21 @@ function local_activitylibrary_coursemodule_standard_elements($formwrapper, $mfo
     global $CFG;
     if (empty($CFG->enableactivitylibrary)) {
         return;
-    } else if (!has_capability('local/activitylibrary:editvalue', $formwrapper->get_context())) {
+    }
+    if (!is_object($formwrapper) || !is_object($mform)) {
         return;
     }
 
     $currentmodule = $formwrapper->get_coursemodule();
+    $mform->addElement('header', 'activitylibrarysettings', get_string('activity_metadata', 'local_activitylibrary'));
+    $mform->addElement(
+        'advcheckbox',
+        'activitylibraryhiddenfromcatalogue',
+        get_string('hidefromcatalogue', 'local_activitylibrary')
+    );
+    $mform->addHelpButton('activitylibraryhiddenfromcatalogue', 'hidefromcatalogue', 'local_activitylibrary');
+    $mform->setType('activitylibraryhiddenfromcatalogue', PARAM_BOOL);
+    $mform->setDefault('activitylibraryhiddenfromcatalogue', 0);
 
     $handler = \local_activitylibrary\customfield\coursemodule_handler::create();
     $handler->instance_form_definition($mform, empty($currentmodule) ? 0 : $currentmodule->id);
@@ -150,6 +154,8 @@ function local_activitylibrary_coursemodule_standard_elements($formwrapper, $mfo
                 $coursemoduledata->$fieldname = $value;
             }
         }
+        $coursemoduledata->activitylibraryhiddenfromcatalogue =
+            \local_activitylibrary\local\utils::is_activity_hidden_from_catalogue((int)$currentmodule->id) ? 1 : 0;
         $formwrapper->set_data($coursemoduledata);
         $handler->instance_form_definition_after_data($mform, $coursemoduledata->coursemodule);
     }
@@ -172,6 +178,10 @@ function local_activitylibrary_coursemodule_edit_post_actions($data, $course) {
     $data->id = $data->coursemodule;
     $handler = \local_activitylibrary\customfield\coursemodule_handler::create($data->id);
     $handler->instance_form_save($data, empty($data->update));
+    \local_activitylibrary\local\utils::set_activity_hidden_from_catalogue(
+        (int)$data->coursemodule,
+        !empty($data->activitylibraryhiddenfromcatalogue)
+    );
 
     return $data;
 }

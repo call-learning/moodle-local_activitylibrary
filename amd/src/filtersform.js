@@ -28,6 +28,56 @@ import Config from 'core/config';
  */
 export default class FiltersForm {
     /**
+     * Check whether a filter value should be considered active.
+     *
+     * @param {*} value
+     * @return {Boolean}
+     */
+    static isMeaningfulValue(value) {
+        if (Array.isArray(value)) {
+            return value.some((item) => FiltersForm.isMeaningfulValue(item));
+        }
+
+        if (value === null || value === undefined) {
+            return false;
+        }
+
+        return String(value).trim() !== '';
+    }
+
+    /**
+     * Check if at least one filter is active.
+     *
+     * @param {String|HTMLElement|JQuery} target
+     * @return {Boolean}
+     */
+    static hasActiveFilters(target) {
+        const filterDataArray = FiltersForm.getFilterData(target, true);
+        return Array.isArray(filterDataArray) && filterDataArray.some((filter) => {
+            if (filter.type === 'date') {
+                return FiltersForm.isMeaningfulValue(filter.value) && filter.value.split(',').length > 3;
+            }
+
+            return FiltersForm.isMeaningfulValue(filter.value);
+        });
+    }
+
+    /**
+     * Update reset button state from current form values.
+     *
+     * @param {JQuery} target
+     */
+    static updateResetButtonState(target) {
+        const form = target.children('form.activitylibrary-filters-form');
+        const resetButton = form.find('[name="resetbutton"]');
+        const hasActiveFilters = FiltersForm.hasActiveFilters(form);
+
+        resetButton.prop('disabled', !hasActiveFilters);
+        resetButton.toggleClass('activitylibrary-reset-inactive', !hasActiveFilters);
+        resetButton.attr('aria-disabled', (!hasActiveFilters).toString());
+    }
+
+    /**
      * Retrieve filter payload from form fields.
      *
      * @param {String|HTMLElement|JQuery} target
@@ -106,20 +156,37 @@ export default class FiltersForm {
      */
     static init(selector) {
         const target = $(selector);
+        const form = target.children('form.activitylibrary-filters-form');
+        const resetButton = form.find('[name="resetbutton"]');
 
         target.on('submit', 'form', (e) => {
             e.preventDefault();
-            const filterDataArray = FiltersForm.getFilterData(target.children('form'), false);
+            const filterDataArray = FiltersForm.getFilterData(form, false);
             if (filterDataArray) {
                 $(document).trigger('activitylibrary-filters-change', [filterDataArray]);
             }
+            FiltersForm.updateResetButtonState(target);
         });
 
-        $('#id_resetbutton').on('click', () => {
-            $(target).children('form.activitylibrary-filters-form')[0].reset();
+        form.on('input change', ':input', () => {
+            FiltersForm.updateResetButtonState(target);
         });
 
-        const filterDataArray = FiltersForm.getFilterData(target.children('form'), true);
+        resetButton.on('click', (e) => {
+            if (!FiltersForm.hasActiveFilters(form)) {
+                e.preventDefault();
+                return;
+            }
+
+            e.preventDefault();
+            form[0].reset();
+            FiltersForm.updateResetButtonState(target);
+            $(document).trigger('activitylibrary-filters-change', [[]]);
+        });
+
+        FiltersForm.updateResetButtonState(target);
+
+        const filterDataArray = FiltersForm.getFilterData(form, true);
         $(document).trigger('activitylibrary-filters-inited', [filterDataArray]);
     }
 }

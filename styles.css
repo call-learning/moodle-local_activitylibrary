@@ -196,6 +196,12 @@
     display: none !important;
 }
 
+.activitylibrary-filters-form [name="resetbutton"]:disabled,
+.activitylibrary-filters-form [name="resetbutton"].activitylibrary-reset-inactive {
+    cursor: default;
+    opacity: .45;
+}
+
 /* Icons and actions */
 .activitylibrary-content a.item-view .icon {
     font-size: 40px;

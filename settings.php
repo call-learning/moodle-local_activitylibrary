@@ -41,11 +41,11 @@ if ($hassiteconfig) {
         empty($CFG->enableactivitylibrary)
     );
 
-    $mainsettings->add(new admin_setting_configtext(
+    $mainsettings->add(new \local_activitylibrary\admin\setting_hidden_courses(
         'local_activitylibrary/hiddencoursesid',
         get_string('activitylibrary:hiddencoursesid', 'local_activitylibrary'),
         get_string('activitylibrary:hiddencoursesid:desc', 'local_activitylibrary'),
-        ''
+        []
     ));
 
     $samplemenutext = '';

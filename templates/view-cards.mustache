@@ -41,6 +41,14 @@
             <div class="card h-100">
                 <a href="{{viewurl}}" tabindex="-1" class="text-decoration-none">
                     <div class="card-img activitylibrary-card-thumbnail p-2">
+                        {{#courseimage}}
+                            <img
+                                class="activitylibrary-card-thumbnail-image"
+                                src="{{{courseimage}}}"
+                                alt=""
+                                loading="lazy"
+                                decoding="async">
+                        {{/courseimage}}
                         {{#iconurl}}
                             <span class="activityiconcontainer activitylibrary-thumbnail-icon {{purpose}} smaller">
                                 <img class="activityicon" src="{{{iconurl}}}" alt="{{modname}}">

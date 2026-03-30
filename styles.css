@@ -84,12 +84,31 @@
 }
 
 .path-local-activitylibrary [data-region="card-deck"] > [data-region="entity-content"] > .card .activitylibrary-card-thumbnail {
-    align-items: center;
+    align-items: flex-end;
+    background-color: #eef3f7;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     display: flex;
     height: 4.25rem;
-    justify-content: center;
+    justify-content: flex-end;
+    overflow: hidden;
+    position: relative;
+}
+
+.local-activitylibrary .activitylibrary-card-thumbnail-image {
+    height: 100%;
+    inset: 0;
+    object-fit: cover;
+    position: absolute;
+    width: 100%;
+}
+
+.local-activitylibrary .activitylibrary-card-thumbnail::before {
+    background: rgba(0, 0, 0, 0.12);
+    content: "";
+    inset: 0;
+    pointer-events: none;
+    position: absolute;
 }
 
 /* stylelint-disable-next-line max-line-length */
@@ -102,8 +121,13 @@
 }
 
 .local-activitylibrary .activitylibrary-thumbnail-icon.activityiconcontainer {
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: .5rem 0 0 0;
     height: 2.25rem;
+    padding: .35rem;
+    position: relative;
     width: 2.25rem;
+    z-index: 1;
 }
 
 .local-activitylibrary .activitylibrary-thumbnail-icon .activityicon {

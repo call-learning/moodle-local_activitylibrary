@@ -27,6 +27,7 @@ namespace local_activitylibrary\external;
 use context_course;
 use context_system;
 use core_course\external\course_module_summary_exporter;
+use core_course\external\course_summary_exporter;
 use core_external\external_api;
 use core_external\external_function_parameters;
 use core_external\external_multiple_structure;
@@ -210,6 +211,7 @@ class get_filtered_activities extends external_api {
         $modulesinfo = [];
         $modinfos = [];
         $modhasintro = [];
+        $courseimages = [];
 
         foreach ($records as $record) {
             if (empty($modinfos[$record->parentid])) {
@@ -254,6 +256,12 @@ class get_filtered_activities extends external_api {
             $recorddata['iconurl'] = $exported['iconurl'] ?? '';
             $recorddata['purpose'] = plugin_supports('mod', $cm->modname, FEATURE_MOD_PURPOSE, MOD_PURPOSE_OTHER);
             $recorddata['modname'] = $cm->modname;
+            if (!array_key_exists($record->parentid, $courseimages)) {
+                $course = get_course($record->parentid);
+                $courseimages[$record->parentid] = course_summary_exporter::get_course_image($course)
+                    ?: $renderer->get_generated_url_for_course($context);
+            }
+            $recorddata['courseimage'] = $courseimages[$record->parentid];
 
             if (!array_key_exists($cm->modname, $modhasintro)) {
                 $modhasintro[$cm->modname] = $DB->get_manager()->field_exists($cm->modname, 'intro');
@@ -316,6 +324,7 @@ class get_filtered_activities extends external_api {
                     'idnumber' => new external_value(PARAM_RAW, 'Id number', VALUE_OPTIONAL),
                     'modname' => new external_value(PARAM_RAW, 'Module name'),
                     'iconurl' => new external_value(PARAM_RAW, 'Module icon URL', VALUE_OPTIONAL),
+                    'courseimage' => new external_value(PARAM_RAW, 'Course image URL', VALUE_OPTIONAL),
                     'purpose' => new external_value(PARAM_ALPHANUMEXT, 'Module purpose', VALUE_OPTIONAL),
                     'description' => new external_value(PARAM_TEXT, 'Module description', VALUE_OPTIONAL),
                     'visible' => new external_value(PARAM_INT, '1 available, 0 unavailable', VALUE_OPTIONAL),

@@ -28,6 +28,20 @@ import Config from 'core/config';
  */
 export default class FiltersForm {
     /**
+     * Dispatch filter state updates through both DOM and jQuery events.
+     *
+     * @param {string} eventName
+     * @param {Array} filterDataArray
+     */
+    static dispatchFilterEvent(eventName, filterDataArray) {
+        document.dispatchEvent(new CustomEvent(eventName, {
+            detail: filterDataArray
+        }));
+
+        $(document).trigger(eventName, [filterDataArray]);
+    }
+
+    /**
      * Check whether a filter value should be considered active.
      *
      * @param {*} value
@@ -95,19 +109,14 @@ export default class FiltersForm {
                 return;
             }
 
-            const parsename = entry.name.match(/(customfield_)?(\w+)\[(\w+)\]\[?(\w*)\]?/);
+            const parsename = entry.name.match(/^(customfield_)?(\w+)\[(\w+)\](?:\[(\w*)\])?$/);
             if (!parsename) {
                 return;
             }
 
-            let hasCustomShortName = false;
-            if (parsename.length >= 4) {
-                parsename.shift();
-                hasCustomShortName = true;
-            }
-
-            const rootname = parsename[1];
-            const type = parsename[2];
+            const hasCustomShortName = Boolean(parsename[1]);
+            const rootname = parsename[2];
+            const type = parsename[3];
 
             if (filterdata[rootname] === undefined) {
                 filterdata[rootname] = {};
@@ -163,7 +172,7 @@ export default class FiltersForm {
             e.preventDefault();
             const filterDataArray = FiltersForm.getFilterData(form, false);
             if (filterDataArray) {
-                $(document).trigger('activitylibrary-filters-change', [filterDataArray]);
+                FiltersForm.dispatchFilterEvent('activitylibrary-filters-change', filterDataArray);
             }
             FiltersForm.updateResetButtonState(target);
         });
@@ -181,12 +190,12 @@ export default class FiltersForm {
             e.preventDefault();
             form[0].reset();
             FiltersForm.updateResetButtonState(target);
-            $(document).trigger('activitylibrary-filters-change', [[]]);
+            FiltersForm.dispatchFilterEvent('activitylibrary-filters-change', []);
         });
 
         FiltersForm.updateResetButtonState(target);
 
         const filterDataArray = FiltersForm.getFilterData(form, true);
-        $(document).trigger('activitylibrary-filters-inited', [filterDataArray]);
+        FiltersForm.dispatchFilterEvent('activitylibrary-filters-inited', filterDataArray || []);
     }
 }

@@ -78,8 +78,8 @@ require(['local_activitylibrary/activitylibrary',
     ], function(Main, FiltersForm, Permalink) {
     var root = document.getElementById('local-activitylibrary-{{uniqid}}');
     Main.init(root);
+    Permalink.init();
     var filters = document.getElementById('activitylibrary-filter-{{uniqid}}');
     FiltersForm.init(filters);
-    Permalink.init();
 });
 {{/js}}

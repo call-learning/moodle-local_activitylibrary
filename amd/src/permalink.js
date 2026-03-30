@@ -27,13 +27,47 @@ import Notification from 'core/notification';
 
 let catalogURL = null;
 
-const updatePermalink = (filterArray) => {
+const removeFilterParams = () => {
+    const paramsToRemove = [];
+    for (const [key] of catalogURL.searchParams.entries()) {
+        if (key.startsWith('customfield_') || key.startsWith('fulltext[') ||
+                key.startsWith('course[') || key.startsWith('modname[')) {
+            paramsToRemove.push(key);
+        }
+    }
+
+    paramsToRemove.forEach((param) => catalogURL.searchParams.delete(param));
+};
+
+const addFilterParam = (fieldname, filter) => {
+    if (!filter.value && filter.value !== 0) {
+        return;
+    }
+
+    catalogURL.searchParams.append(fieldname + '[operator]', filter.operator);
+    catalogURL.searchParams.append(fieldname + '[type]', filter.type);
+
+    if (Array.isArray(filter.value)) {
+        filter.value.forEach((value) => {
+            catalogURL.searchParams.append(fieldname + '[value][]', value);
+        });
+        return;
+    }
+
+    catalogURL.searchParams.append(fieldname + '[value]', filter.value);
+};
+
+const updatePermalink = (filterArray = []) => {
+    removeFilterParams();
+
     filterArray.forEach((filter) => {
-        const fieldname = 'customfield_' + filter.shortname;
-        if (filter.value) {
-            catalogURL.searchParams.append(fieldname + '[operator]', filter.operator);
-            catalogURL.searchParams.append(fieldname + '[value]', filter.value);
-            catalogURL.searchParams.append(fieldname + '[type]', filter.type);
+        if (filter.shortname) {
+            addFilterParam('customfield_' + filter.shortname, filter);
+            return;
+        }
+
+        if (filter.type === 'fulltext' || filter.type === 'course' || filter.type === 'modname') {
+            addFilterParam(filter.type, filter);
         }
     });
 
@@ -53,11 +87,27 @@ export default class Permalink {
      * @param {string} targetid
      */
     static setupCopyLink(triggerid, targetid) {
-        document.querySelector('#' + triggerid).addEventListener('click', () => {
+        const triggerElement = document.querySelector('#' + triggerid);
+        if (!triggerElement) {
+            return;
+        }
+
+        triggerElement.addEventListener('click', async() => {
             const target = document.getElementById(targetid);
+            if (!target) {
+                return;
+            }
+
             target.select();
-            if (document.execCommand('copy')) {
-                Toast.add(Str.get_string('copied', 'local_activitylibrary'), null, 'success');
+            try {
+                await navigator.clipboard.writeText(target.value);
+                const copiedString = await Str.get_string('copied', 'local_activitylibrary');
+                Toast.add(copiedString, null, 'success');
+            } catch (error) {
+                if (document.execCommand('copy')) {
+                    const copiedString = await Str.get_string('copied', 'local_activitylibrary');
+                    Toast.add(copiedString, null, 'success');
+                }
             }
         });
     }
@@ -67,6 +117,7 @@ export default class Permalink {
      */
     static init() {
         catalogURL = new URL(window.location.href);
+        updatePermalink();
 
         document.addEventListener('activitylibrary-filters-change', (event) => {
             if (event.detail) {
@@ -76,6 +127,9 @@ export default class Permalink {
 
         if (window.jQuery) {
             window.jQuery(document).on('activitylibrary-filters-change', (e, filterArray) => {
+                updatePermalink(filterArray);
+            });
+            window.jQuery(document).on('activitylibrary-filters-inited', (e, filterArray) => {
                 updatePermalink(filterArray);
             });
         }

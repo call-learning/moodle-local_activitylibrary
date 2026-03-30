@@ -96,10 +96,12 @@ final class get_filtered_activities_test extends testcase {
         $dg->create_module('label', (object)([
             'course' => $course->id,
             'name' => 'Alpha label',
+            'intro' => 'Label intro',
         ] + $this->get_simple_cf_data()));
         $dg->create_module('page', (object)([
             'course' => $course->id,
             'name' => 'Alpha page',
+            'intro' => 'Special keyword in page description',
         ] + $this->get_simple_cf_data()));
 
         $activities = $this->get_filtered_activities(
@@ -114,6 +116,18 @@ final class get_filtered_activities_test extends testcase {
         $first = reset($activities);
         $this->assertEquals('label', $first['modname']);
         $this->assertEquals('Alpha label', $first['fullname']);
+
+        $activities = $this->get_filtered_activities(
+            [$course->id],
+            [
+                ['type' => 'fulltext', 'operator' => 0, 'value' => 'keyword'],
+            ]
+        );
+
+        $this->assertCount(1, $activities);
+        $first = reset($activities);
+        $this->assertEquals('page', $first['modname']);
+        $this->assertEquals('Alpha page', $first['fullname']);
     }
 
     /**

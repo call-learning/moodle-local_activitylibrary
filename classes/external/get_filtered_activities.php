@@ -231,10 +231,6 @@ class get_filtered_activities extends external_api {
             if (!$cm->uservisible) {
                 continue;
             }
-            if ($fulltext !== '' && stripos($cm->name, $fulltext) === false) {
-                continue;
-            }
-
             $PAGE->set_context($context);
             $exported = (array)(new course_module_summary_exporter(null, ['cm' => $cm]))->export($renderer);
             $recorddata = (array)$record;
@@ -271,6 +267,14 @@ class get_filtered_activities extends external_api {
                     }
                 }
             }
+
+            if ($fulltext !== '') {
+                $description = $recorddata['description'] ?? '';
+                if (stripos($cm->name, $fulltext) === false && stripos($description, $fulltext) === false) {
+                    continue;
+                }
+            }
+
             $modulesinfo[] = $recorddata;
         }
 

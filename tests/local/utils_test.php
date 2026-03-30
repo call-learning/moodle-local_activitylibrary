@@ -153,4 +153,29 @@ final class utils_test extends testcase {
         $this->assertFalse($DB->record_exists('local_activitylibrary_status', ['coursemoduleid' => $cm->id]));
         $this->assertFalse(utils::is_activity_hidden_from_catalogue((int)$cm->id));
     }
+
+    /**
+     * Test available activity tags only expose tags from visible activities in scope.
+     *
+     * @covers \local_activitylibrary\local\utils::get_available_activity_tags
+     */
+    public function test_get_available_activity_tags(): void {
+        $dg = $this->getDataGenerator();
+        $course = $dg->create_course();
+        $activity = $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Tagged activity',
+        ] + $this->get_simple_cf_data()));
+        $cm = get_coursemodule_from_instance('label', $activity->id, $course->id, false, MUST_EXIST);
+
+        \core_tag_tag::add_item_tag('core', 'course_modules', $cm->id, \context_module::instance($cm->id), 'Visible tag');
+
+        $tags = utils::get_available_activity_tags();
+
+        $this->assertContains('Visible tag', $tags);
+
+        utils::set_activity_hidden_from_catalogue((int)$cm->id, true);
+        $tags = utils::get_available_activity_tags();
+        $this->assertNotContains('Visible tag', $tags);
+    }
 }

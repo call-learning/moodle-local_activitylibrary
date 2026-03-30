@@ -147,23 +147,29 @@ class get_filtered_activities extends external_api {
         $customfieldfilters = [];
         $selectedcourseids = [];
         $selectedmodules = [];
+        $selectedtagids = [];
         $fulltext = '';
         foreach ($params['filters'] as $filter) {
             $type = $filter['type'] ?? '';
-            $rawvalue = trim((string)($filter['value'] ?? ''));
-            if ($rawvalue === '') {
+            $rawvalue = $filter['value'] ?? '';
+            $rawvaluestring = trim((string)$rawvalue);
+            if ($rawvaluestring === '') {
                 continue;
             }
             if ($type === 'course') {
-                $selectedcourseids[] = (int)$rawvalue;
+                $selectedcourseids[] = (int)$rawvaluestring;
                 continue;
             }
             if ($type === 'modname') {
-                $selectedmodules[] = clean_param($rawvalue, PARAM_ALPHANUMEXT);
+                $selectedmodules[] = clean_param($rawvaluestring, PARAM_ALPHANUMEXT);
+                continue;
+            }
+            if ($type === 'tags') {
+                $selectedtagids = array_merge($selectedtagids, utils::parse_configured_ids($rawvaluestring));
                 continue;
             }
             if ($type === 'fulltext') {
-                $fulltext = clean_param($rawvalue, PARAM_TEXT);
+                $fulltext = clean_param($rawvaluestring, PARAM_TEXT);
                 continue;
             }
             $customfieldfilters[] = $filter;
@@ -193,6 +199,23 @@ class get_filtered_activities extends external_api {
             [$hiddeninsql, $hiddeninparams] = $DB->get_in_or_equal($hiddenactivityids, SQL_PARAMS_NAMED, 'hiddenactivity', false);
             $sqlwhere .= " AND e.id {$hiddeninsql}";
             $sqlparams += $hiddeninparams;
+        }
+
+        $selectedtagids = array_values(array_unique(array_filter($selectedtagids)));
+        if (!empty($selectedtagids)) {
+            [$taginsql, $taginparams] = $DB->get_in_or_equal($selectedtagids, SQL_PARAMS_NAMED, 'tagid');
+            $sqlwhere .= " AND EXISTS (
+                    SELECT 1
+                      FROM {tag_instance} ti
+                     WHERE ti.itemid = e.id
+                       AND ti.component = :tagcomponent
+                       AND ti.itemtype = :tagitemtype
+                       AND ti.tagid {$taginsql}
+                )";
+            $sqlparams += [
+                'tagcomponent' => 'core',
+                'tagitemtype' => 'course_modules',
+            ] + $taginparams;
         }
 
         $additionalfields = [

@@ -66,6 +66,7 @@ $string['filter:anyvalue'] = 'Any';
 $string['filter:course'] = 'Course';
 $string['filter:modname'] = 'Activity type';
 $string['filter:submit'] = 'Filter';
+$string['filter:tags'] = 'Tags';
 $string['filters'] = 'Filters';
 $string['fulltext'] = 'Search by text';
 $string['hiddenfromstudents'] = 'Closed';

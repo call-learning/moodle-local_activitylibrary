@@ -52,6 +52,7 @@ class filter_form extends \moodleform {
             'local_activitylibrary\local\filters\fulltext_filter',
             'local_activitylibrary\local\filters\course_filter',
             'local_activitylibrary\local\filters\modname_filter',
+            'local_activitylibrary\local\filters\tags_filter',
         ];
         foreach ($staticfilters as $filterclass) {
             if (class_exists($filterclass)) {
@@ -92,7 +93,7 @@ class filter_form extends \moodleform {
         merge_query_params($submission, $_POST);
         $prefilters = [];
 
-        foreach (['course', 'modname', 'fulltext'] as $staticfiltername) {
+        foreach (['course', 'modname', 'fulltext', 'tags'] as $staticfiltername) {
             if (!empty($submission[$staticfiltername]) && is_array($submission[$staticfiltername])) {
                 $prefilters[$staticfiltername]['operator'] = clean_param(
                     $submission[$staticfiltername]['operator'] ?? activitylibrary_filter_interface::OPERATOR_EQUAL,
@@ -102,11 +103,23 @@ class filter_form extends \moodleform {
                     $submission[$staticfiltername]['type'] ?? $staticfiltername,
                     PARAM_ALPHANUMEXT
                 );
-                $prefilters[$staticfiltername]['value'] = clean_param(
-                    $submission[$staticfiltername]['value'] ?? '',
-                    $staticfiltername === 'course' ? PARAM_INT :
-                        ($staticfiltername === 'fulltext' ? PARAM_TEXT : PARAM_ALPHANUMEXT)
-                );
+                $rawvalue = $submission[$staticfiltername]['value'] ?? '';
+                if ($staticfiltername === 'tags') {
+                    if (is_array($rawvalue)) {
+                        $prefilters[$staticfiltername]['value'] = array_map('intval', $rawvalue);
+                    } else {
+                        $prefilters[$staticfiltername]['value'] = array_map(
+                            'intval',
+                            utils::parse_configured_ids((string)$rawvalue)
+                        );
+                    }
+                } else {
+                    $prefilters[$staticfiltername]['value'] = clean_param(
+                        $rawvalue,
+                        $staticfiltername === 'course' ? PARAM_INT :
+                            ($staticfiltername === 'fulltext' ? PARAM_TEXT : PARAM_ALPHANUMEXT)
+                    );
+                }
             }
         }
 

@@ -201,6 +201,47 @@ final class get_filtered_activities_test extends testcase {
     }
 
     /**
+     * Test activity filters by tags.
+     *
+     * @covers \local_activitylibrary\external\get_filtered_activities::execute
+     * @runInSeparateProcess
+     */
+    public function test_get_filtered_activities_tags_filter(): void {
+        global $DB;
+
+        $dg = $this->getDataGenerator();
+        $course = $dg->create_course();
+
+        $taggedactivity = $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Tagged activity',
+        ] + $this->get_simple_cf_data()));
+        $otheractivity = $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Other activity',
+        ] + $this->get_simple_cf_data()));
+
+        $taggedcm = get_coursemodule_from_instance('label', $taggedactivity->id, $course->id, false, MUST_EXIST);
+        $othercm = get_coursemodule_from_instance('label', $otheractivity->id, $course->id, false, MUST_EXIST);
+
+        \core_tag_tag::add_item_tag('core', 'course_modules', $taggedcm->id, \context_module::instance($taggedcm->id), 'Important');
+        \core_tag_tag::add_item_tag('core', 'course_modules', $othercm->id, \context_module::instance($othercm->id), 'Secondary');
+
+        $tagid = $DB->get_field('tag', 'id', ['rawname' => 'Important'], MUST_EXIST);
+
+        $activities = $this->get_filtered_activities(
+            [$course->id],
+            [
+                ['type' => 'tags', 'operator' => 0, 'value' => (string)$tagid],
+            ]
+        );
+
+        $this->assertCount(1, $activities);
+        $this->assertSame('Tagged activity', $activities[0]['fullname']);
+        $this->assertSame((int)$taggedcm->id, (int)$activities[0]['id']);
+    }
+
+    /**
      * Test that invalid sort entries are ignored in SQL.
      *
      * @covers \local_activitylibrary\external\get_filtered_activities::get_sort_options_sql

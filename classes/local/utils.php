@@ -52,14 +52,14 @@ class utils {
      * @param string|null $configvalue
      * @return array
      */
-    protected static function parse_configured_ids(?string $configvalue): array {
+    public static function parse_configured_ids(?string $configvalue): array {
         if (!$configvalue) {
             return [];
         }
 
         $ids = preg_split('/[\s,]+/', $configvalue);
         $ids = array_map('intval', $ids);
-        $ids = array_filter($ids, function(int $id): bool {
+        $ids = array_filter($ids, function (int $id): bool {
             return $id > 0;
         });
 
@@ -76,6 +76,28 @@ class utils {
     }
 
     /**
+     * Get the course ids currently in activity library scope for the active user.
+     *
+     * @return array
+     * @throws \dml_exception
+     */
+    public static function get_catalog_scope_course_ids(): array {
+        global $DB;
+
+        if (is_siteadmin()) {
+            $scopeids = $DB->get_fieldset_select('course', 'id', 'id <> :siteid', ['siteid' => SITEID]);
+        } else {
+            $scopeids = array_keys(enrol_get_my_courses());
+        }
+
+        if (empty($scopeids)) {
+            return [];
+        }
+
+        return array_values(array_diff(array_map('intval', $scopeids), self::get_hidden_course_ids()));
+    }
+
+    /**
      * Get activity IDs hidden from the activity library.
      *
      * @return array
@@ -89,11 +111,60 @@ class utils {
         }
 
         $records = $DB->get_records('local_activitylibrary_status', ['visibility' => self::ITEM_HIDDEN], '', 'coursemoduleid');
-        $ids = array_map(function(\stdClass $record): int {
+        $ids = array_map(function (\stdClass $record): int {
             return (int)$record->coursemoduleid;
         }, $records);
 
         return array_values(array_unique($ids));
+    }
+
+    /**
+     * Get the selectable activity tags available in the current catalogue scope.
+     *
+     * @return array
+     * @throws \dml_exception
+     */
+    public static function get_available_activity_tags(): array {
+        global $DB;
+
+        $scopeids = self::get_catalog_scope_course_ids();
+        if (empty($scopeids)) {
+            return [];
+        }
+
+        [$coursesql, $courseparams] = $DB->get_in_or_equal($scopeids, SQL_PARAMS_NAMED, 'tagcourse');
+        $params = $courseparams + [
+            'tagcomponent' => 'core',
+            'tagitemtype' => 'course_modules',
+        ];
+
+        $sql = "SELECT DISTINCT t.id, t.rawname
+                  FROM {tag} t
+                  JOIN {tag_instance} ti
+                    ON ti.tagid = t.id
+                   AND ti.component = :tagcomponent
+                   AND ti.itemtype = :tagitemtype
+                  JOIN {course_modules} cm
+                    ON cm.id = ti.itemid
+                 WHERE cm.visible = 1
+                   AND cm.course {$coursesql}";
+
+        $hiddenactivityids = self::get_hidden_activity_ids();
+        if (!empty($hiddenactivityids)) {
+            [$hiddensql, $hiddenparams] = $DB->get_in_or_equal($hiddenactivityids, SQL_PARAMS_NAMED, 'taghidden', false);
+            $sql .= " AND cm.id {$hiddensql}";
+            $params += $hiddenparams;
+        }
+
+        $sql .= " ORDER BY t.rawname ASC";
+
+        $records = $DB->get_records_sql($sql, $params);
+        $choices = [];
+        foreach ($records as $record) {
+            $choices[(int)$record->id] = $record->rawname;
+        }
+
+        return $choices;
     }
 
     /**

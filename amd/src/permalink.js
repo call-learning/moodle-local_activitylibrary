@@ -31,7 +31,8 @@ const removeFilterParams = () => {
     const paramsToRemove = [];
     for (const [key] of catalogURL.searchParams.entries()) {
         if (key.startsWith('customfield_') || key.startsWith('fulltext[') ||
-                key.startsWith('course[') || key.startsWith('modname[')) {
+                key.startsWith('course[') || key.startsWith('modname[') ||
+                key.startsWith('tags[')) {
             paramsToRemove.push(key);
         }
     }
@@ -66,7 +67,7 @@ const updatePermalink = (filterArray = []) => {
             return;
         }
 
-        if (filter.type === 'fulltext' || filter.type === 'course' || filter.type === 'modname') {
+        if (filter.type === 'fulltext' || filter.type === 'course' || filter.type === 'modname' || filter.type === 'tags') {
             addFilterParam(filter.type, filter);
         }
     });

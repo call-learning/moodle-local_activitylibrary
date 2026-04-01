@@ -136,7 +136,7 @@ class get_filtered_activities extends external_api {
         }
 
         if (empty($scopeids)) {
-            return [];
+            return self::empty_result();
         }
 
         $scopeids = array_values(array_diff($scopeids, utils::get_hidden_course_ids()));
@@ -178,7 +178,7 @@ class get_filtered_activities extends external_api {
         if (!empty($selectedcourseids)) {
             $scopeids = array_values(array_intersect($scopeids, array_unique(array_filter($selectedcourseids))));
             if (empty($scopeids)) {
-                return [];
+                return self::empty_result();
             }
         }
 
@@ -220,6 +220,7 @@ class get_filtered_activities extends external_api {
 
         $additionalfields = [
             'modname' => 'm.name AS modname',
+            'modinstance' => 'e.instance AS modinstance',
             'parentid' => 'e.course AS parentid',
             'category' => 'c.fullname AS category',
             'categoryname' => 'c.fullname AS categoryname',
@@ -338,38 +339,46 @@ class get_filtered_activities extends external_api {
             }
         }
 
-        return array_slice($modulesinfo, $params['offset'], $params['limit'] ? $params['limit'] : null);
+        return [
+            'entities' => array_slice($modulesinfo, $params['offset'], $params['limit'] ? $params['limit'] : null),
+            'totalcount' => count($modulesinfo),
+        ];
     }
 
     /**
      * Returns description of method result value.
      *
-     * @return external_multiple_structure
+     * @return external_single_structure
      */
     public static function execute_returns() {
-        return new external_multiple_structure(
-            new external_single_structure(
-                [
-                    'id' => new external_value(PARAM_INT, 'Activity id'),
-                    'parentid' => new external_value(PARAM_INT, 'Parent course id'),
-                    'fullname' => new external_value(PARAM_TEXT, 'Activity full name'),
-                    'idnumber' => new external_value(PARAM_RAW, 'Id number', VALUE_OPTIONAL),
-                    'modname' => new external_value(PARAM_RAW, 'Module name'),
-                    'iconurl' => new external_value(PARAM_RAW, 'Module icon URL', VALUE_OPTIONAL),
-                    'courseimage' => new external_value(PARAM_RAW, 'Course image URL', VALUE_OPTIONAL),
-                    'purpose' => new external_value(PARAM_ALPHANUMEXT, 'Module purpose', VALUE_OPTIONAL),
-                    'description' => new external_value(PARAM_TEXT, 'Module description', VALUE_OPTIONAL),
-                    'visible' => new external_value(PARAM_INT, '1 available, 0 unavailable', VALUE_OPTIONAL),
-                    'groupmode' => new external_value(PARAM_INT, 'Group mode', VALUE_OPTIONAL),
-                    'groupingid' => new external_value(PARAM_INT, 'Grouping id', VALUE_OPTIONAL),
-                    'timecreated' => new external_value(PARAM_INT, 'Creation time', VALUE_OPTIONAL),
-                    'timemodified' => new external_value(PARAM_INT, 'Modification time', VALUE_OPTIONAL),
-                    'category' => new external_value(PARAM_TEXT, 'Course full name', VALUE_OPTIONAL),
-                    'categoryname' => new external_value(PARAM_TEXT, 'Course full name', VALUE_OPTIONAL),
-                    'viewurl' => new external_value(PARAM_URL, 'Activity URL'),
-                ],
-                'Activity summary'
-            )
+        return new external_single_structure(
+            [
+                'entities' => new external_multiple_structure(
+                    new external_single_structure(
+                        [
+                            'id' => new external_value(PARAM_INT, 'Activity id'),
+                            'parentid' => new external_value(PARAM_INT, 'Parent course id'),
+                            'fullname' => new external_value(PARAM_TEXT, 'Activity full name'),
+                            'idnumber' => new external_value(PARAM_RAW, 'Id number', VALUE_OPTIONAL),
+                            'modname' => new external_value(PARAM_RAW, 'Module name'),
+                            'iconurl' => new external_value(PARAM_RAW, 'Module icon URL', VALUE_OPTIONAL),
+                            'courseimage' => new external_value(PARAM_RAW, 'Course image URL', VALUE_OPTIONAL),
+                            'purpose' => new external_value(PARAM_ALPHANUMEXT, 'Module purpose', VALUE_OPTIONAL),
+                            'description' => new external_value(PARAM_TEXT, 'Module description', VALUE_OPTIONAL),
+                            'visible' => new external_value(PARAM_INT, '1 available, 0 unavailable', VALUE_OPTIONAL),
+                            'groupmode' => new external_value(PARAM_INT, 'Group mode', VALUE_OPTIONAL),
+                            'groupingid' => new external_value(PARAM_INT, 'Grouping id', VALUE_OPTIONAL),
+                            'timecreated' => new external_value(PARAM_INT, 'Creation time', VALUE_OPTIONAL),
+                            'timemodified' => new external_value(PARAM_INT, 'Modification time', VALUE_OPTIONAL),
+                            'category' => new external_value(PARAM_TEXT, 'Course full name', VALUE_OPTIONAL),
+                            'categoryname' => new external_value(PARAM_TEXT, 'Course full name', VALUE_OPTIONAL),
+                            'viewurl' => new external_value(PARAM_URL, 'Activity URL'),
+                        ],
+                        'Activity summary'
+                    )
+                ),
+                'totalcount' => new external_value(PARAM_INT, 'Total number of matching activities'),
+            ]
         );
     }
 
@@ -404,10 +413,10 @@ class get_filtered_activities extends external_api {
 
         $moduleinstances = [];
         foreach ($records as $record) {
-            if (empty($record->modname) || empty($record->id)) {
+            if (empty($record->modname) || empty($record->modinstance)) {
                 continue;
             }
-            $moduleinstances[$record->modname][] = (int)$record->id;
+            $moduleinstances[$record->modname][] = (int)$record->modinstance;
         }
 
         $metadata = [];
@@ -440,5 +449,17 @@ class get_filtered_activities extends external_api {
         }
 
         return $metadata;
+    }
+
+    /**
+     * Build an empty result payload matching execute_returns().
+     *
+     * @return array
+     */
+    protected static function empty_result(): array {
+        return [
+            'entities' => [],
+            'totalcount' => 0,
+        ];
     }
 }

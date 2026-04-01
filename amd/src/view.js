@@ -57,7 +57,8 @@ const createState = () => ({
     eventNamespace: '',
     filterEventNamespace: '',
     currentFilters: [],
-    courseIds: []
+    courseIds: [],
+    totalCount: 0
 });
 
 const getState = (root) => {
@@ -108,6 +109,21 @@ const fetchEntities = (state, modifiers, limit, offset) => Repository.getFiltere
     limit,
     offset
 });
+
+const getResultsCountLabel = (offset, entitiesLength, totalCount) => {
+    if (!totalCount) {
+        return '0 / 0';
+    }
+
+    const start = offset + 1;
+    const end = Math.min(offset + entitiesLength, totalCount);
+
+    return start + '-' + end + ' / ' + totalCount;
+};
+
+const updateResultsCount = (root, offset, entitiesLength, totalCount) => {
+    root.find(Selectors.resultsCount.region).text(getResultsCountLabel(offset, entitiesLength, totalCount));
+};
 
 const removeHiddenCategoriesIfNeeded = (entities, showCategories) => {
     if (showCategories) {
@@ -190,13 +206,26 @@ const initializePagedContent = (root, state) => {
 
         if (state.lastPage === currentPage) {
             actions.allItemsLoaded(state.lastPage);
+            if (state.loadedPages[currentPage]) {
+                updateResultsCount(
+                    root,
+                    limit * (currentPage - 1),
+                    state.loadedPages[currentPage].entities.length,
+                    state.loadedPages[currentPage].totalcount
+                );
+            }
             return renderEntities(root, state.loadedPages[currentPage]);
         }
 
         state.lastLimit = limit;
         return fetchEntities(state, modifiers, limit, limit * (currentPage - 1))
-            .then((entities) => {
-                state.loadedPages[currentPage] = {entities};
+            .then((response) => {
+                const entities = response.entities || [];
+                const totalcount = response.totalcount || 0;
+
+                state.totalCount = totalcount;
+                state.loadedPages[currentPage] = {entities, totalcount};
+                updateResultsCount(root, limit * (currentPage - 1), entities.length, totalcount);
 
                 if (entities.length < pageData.limit) {
                     state.lastPage = currentPage;
@@ -221,6 +250,7 @@ const resetStateCache = (state) => {
     state.loadedPages = [];
     state.lastPage = 0;
     state.lastLimit = 0;
+    state.totalCount = 0;
 };
 
 /**

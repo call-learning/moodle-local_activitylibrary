@@ -35,4 +35,15 @@ export default class Selectors {
             regionContent: '[data-region="activitylibrary-view-content"]'
         };
     }
+
+    /**
+     * Results count selectors.
+     *
+     * @return {object}
+     */
+    static get resultsCount() {
+        return {
+            region: '[data-region="activitylibrary-results-count"]'
+        };
+    }
 }

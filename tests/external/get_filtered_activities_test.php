@@ -48,8 +48,8 @@ final class get_filtered_activities_test extends testcase {
      * @return mixed
      */
     protected function get_filtered_activities(...$params) {
-        $activities = get_filtered_activities::execute(...$params);
-        return external_api::clean_returnvalue(get_filtered_activities::execute_returns(), $activities);
+        $result = get_filtered_activities::execute(...$params);
+        return external_api::clean_returnvalue(get_filtered_activities::execute_returns(), $result);
     }
 
     /**
@@ -76,8 +76,10 @@ final class get_filtered_activities_test extends testcase {
         ] + $this->get_simple_cf_data();
         $dg->create_module('label', (object)$activitydata);
 
-        $activities = $this->get_filtered_activities([$course->id]);
+        $result = $this->get_filtered_activities([$course->id]);
+        $activities = $result['entities'];
         $this->assertCount(1, $activities);
+        $this->assertSame(1, $result['totalcount']);
         $first = reset($activities);
         $this->assertEquals('Activity 1', $first['fullname']);
         $this->assertEquals($course->id, $first['parentid']);
@@ -104,25 +106,27 @@ final class get_filtered_activities_test extends testcase {
             'intro' => 'Special keyword in page description',
         ] + $this->get_simple_cf_data()));
 
-        $activities = $this->get_filtered_activities(
+        $result = $this->get_filtered_activities(
             [$course->id],
             [
                 ['type' => 'modname', 'operator' => 0, 'value' => 'label'],
                 ['type' => 'fulltext', 'operator' => 0, 'value' => 'alpha'],
             ]
         );
+        $activities = $result['entities'];
 
         $this->assertCount(1, $activities);
         $first = reset($activities);
         $this->assertEquals('label', $first['modname']);
         $this->assertEquals('Alpha label', $first['fullname']);
 
-        $activities = $this->get_filtered_activities(
+        $result = $this->get_filtered_activities(
             [$course->id],
             [
                 ['type' => 'fulltext', 'operator' => 0, 'value' => 'keyword'],
             ]
         );
+        $activities = $result['entities'];
 
         $this->assertCount(1, $activities);
         $first = reset($activities);
@@ -147,15 +151,17 @@ final class get_filtered_activities_test extends testcase {
             ] + $this->get_simple_cf_data()));
         }
 
-        $activities = $this->get_filtered_activities(
+        $result = $this->get_filtered_activities(
             [$course->id],
             [],
             2,
             1,
             [['column' => 'fullname', 'order' => 'ASC']]
         );
+        $activities = $result['entities'];
 
         $this->assertCount(2, $activities);
+        $this->assertSame(3, $result['totalcount']);
         $this->assertEquals('Activity B', $activities[0]['fullname']);
         $this->assertEquals('Activity C', $activities[1]['fullname']);
     }
@@ -192,9 +198,11 @@ final class get_filtered_activities_test extends testcase {
         set_config('hiddencoursesid', (string)$coursehidden->id, 'local_activitylibrary');
         \local_activitylibrary\local\utils::set_activity_hidden_from_catalogue((int)$hiddencm->id, true);
 
-        $activities = $this->get_filtered_activities([$coursehidden->id, $coursevisible->id]);
+        $result = $this->get_filtered_activities([$coursehidden->id, $coursevisible->id]);
+        $activities = $result['entities'];
 
         $this->assertCount(1, $activities);
+        $this->assertSame(1, $result['totalcount']);
         $this->assertEquals('Visible activity', $activities[0]['fullname']);
         $this->assertEquals($coursevisible->id, $activities[0]['parentid']);
         $this->assertSame((int)$visiblecm->id, (int)$activities[0]['id']);
@@ -229,14 +237,16 @@ final class get_filtered_activities_test extends testcase {
 
         $tagid = $DB->get_field('tag', 'id', ['rawname' => 'Important'], MUST_EXIST);
 
-        $activities = $this->get_filtered_activities(
+        $result = $this->get_filtered_activities(
             [$course->id],
             [
                 ['type' => 'tags', 'operator' => 0, 'value' => (string)$tagid],
             ]
         );
+        $activities = $result['entities'];
 
         $this->assertCount(1, $activities);
+        $this->assertSame(1, $result['totalcount']);
         $this->assertSame('Tagged activity', $activities[0]['fullname']);
         $this->assertSame((int)$taggedcm->id, (int)$activities[0]['id']);
     }
@@ -331,7 +341,8 @@ final class get_filtered_activities_test extends testcase {
         \course_modinfo::clear_instance_cache();
 
         $courseids = $useemptycoursescope ? [] : [$course1->id, $course2->id];
-        $activities = $this->get_filtered_activities($courseids);
+        $result = $this->get_filtered_activities($courseids);
+        $activities = $result['entities'];
         $returnednames = array_column($activities, 'fullname');
         sort($returnednames);
         sort($expectednames);
@@ -415,7 +426,7 @@ final class get_filtered_activities_test extends testcase {
             'name' => 'No match',
         ] + $nonmatchdata));
 
-        $activities = $this->get_filtered_activities(
+        $result = $this->get_filtered_activities(
             [$course->id],
             [[
                 'type' => 'customfield',
@@ -424,6 +435,7 @@ final class get_filtered_activities_test extends testcase {
                 'value' => $filtervalue,
             ]]
         );
+        $activities = $result['entities'];
 
         $this->assertCount(1, $activities);
         $this->assertEquals('Match', $activities[0]['fullname']);

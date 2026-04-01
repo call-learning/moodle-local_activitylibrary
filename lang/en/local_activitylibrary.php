@@ -22,7 +22,7 @@
  * @copyright  2025 CALL Learning - Laurent David laurent@call-learning.fr
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['activity_metadata'] = 'Metatdata for Activity Library';
+$string['activity_metadata'] = 'Activity Library Parameters';
 $string['activitylibrary'] = 'Activity library';
 $string['activitylibrary:changelockedcustomfields'] = 'Can change locked Activity Library Custom Field values';
 $string['activitylibrary:configurecustomfields'] = 'Can configure Activity Library Custom Field values';

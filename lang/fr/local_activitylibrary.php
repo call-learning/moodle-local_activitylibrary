@@ -23,7 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['activity_metadata'] = 'Metatdata pour la Bibliothèque d\'activités';
+$string['activity_metadata'] = 'Paramètres Bibliothèque d\'activités';
 $string['activitylibrary'] = 'Bibliothèque d\'activités';
 $string['activitylibrary:activateactivitylibrary'] = 'Activer la bibliothèque d\'activités';
 $string['activitylibrary:activateactivitylibrary:desc'] =

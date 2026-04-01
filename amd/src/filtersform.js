@@ -28,6 +28,28 @@ import Config from 'core/config';
  */
 export default class FiltersForm {
     /**
+     * Get the current catalogue URL without filter query params.
+     *
+     * @return {string}
+     */
+    static getUnfilteredUrl() {
+        const url = new URL(window.location.href);
+        const paramsToRemove = [];
+
+        for (const [key] of url.searchParams.entries()) {
+            if (key.startsWith('customfield_') || key.startsWith('fulltext[') ||
+                    key.startsWith('course[') || key.startsWith('modname[') ||
+                    key.startsWith('tags[')) {
+                paramsToRemove.push(key);
+            }
+        }
+
+        paramsToRemove.forEach((param) => url.searchParams.delete(param));
+
+        return url.toString();
+    }
+
+    /**
      * Dispatch filter state updates through both DOM and jQuery events.
      *
      * @param {string} eventName
@@ -188,9 +210,7 @@ export default class FiltersForm {
             }
 
             e.preventDefault();
-            form[0].reset();
-            FiltersForm.updateResetButtonState(target);
-            FiltersForm.dispatchFilterEvent('activitylibrary-filters-change', []);
+            window.location.assign(FiltersForm.getUnfilteredUrl());
         });
 
         FiltersForm.updateResetButtonState(target);

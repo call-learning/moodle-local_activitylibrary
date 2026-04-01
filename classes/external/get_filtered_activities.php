@@ -247,8 +247,8 @@ class get_filtered_activities extends external_api {
         $renderer = $PAGE->get_renderer('core');
         $modulesinfo = [];
         $modinfos = [];
-        $modhasintro = [];
         $courseimages = [];
+        $modulemetadata = self::get_module_metadata_map($records);
 
         foreach ($records as $record) {
             if (empty($modinfos[$record->parentid])) {
@@ -285,7 +285,7 @@ class get_filtered_activities extends external_api {
                 $recorddata['viewurl'] = (new moodle_url('/course/view.php', ['id' => $record->parentid]))->out(false);
             }
 
-            $timemodified = $DB->get_field($cm->modname, 'timemodified', ['id' => $cm->instance]);
+            $timemodified = $modulemetadata[$cm->modname][$cm->instance]['timemodified'] ?? null;
             if (!empty($timemodified)) {
                 $recorddata['timemodified'] = (int)$timemodified;
             }
@@ -300,16 +300,11 @@ class get_filtered_activities extends external_api {
             }
             $recorddata['courseimage'] = $courseimages[$record->parentid];
 
-            if (!array_key_exists($cm->modname, $modhasintro)) {
-                $modhasintro[$cm->modname] = $DB->get_manager()->field_exists($cm->modname, 'intro');
-            }
-            if ($modhasintro[$cm->modname]) {
-                $intro = (string)$DB->get_field($cm->modname, 'intro', ['id' => $cm->instance]);
-                if ($intro !== '') {
-                    $description = preg_replace('/\s+/', ' ', trim(strip_tags($intro)));
-                    if (!empty($description)) {
-                        $recorddata['description'] = $description;
-                    }
+            $intro = (string)($modulemetadata[$cm->modname][$cm->instance]['intro'] ?? '');
+            if ($intro !== '') {
+                $description = preg_replace('/\s+/', ' ', trim(strip_tags($intro)));
+                if (!empty($description)) {
+                    $recorddata['description'] = $description;
                 }
             }
 
@@ -396,5 +391,54 @@ class get_filtered_activities extends external_api {
             $sortsqls[] = "{$column} {$order}";
         }
         return implode(',', $sortsqls);
+    }
+
+    /**
+     * Preload module metadata needed later in execute() to avoid N+1 queries.
+     *
+     * @param array $records
+     * @return array
+     */
+    protected static function get_module_metadata_map(array $records): array {
+        global $DB;
+
+        $moduleinstances = [];
+        foreach ($records as $record) {
+            if (empty($record->modname) || empty($record->id)) {
+                continue;
+            }
+            $moduleinstances[$record->modname][] = (int)$record->id;
+        }
+
+        $metadata = [];
+        $dbman = $DB->get_manager();
+        foreach ($moduleinstances as $modname => $instanceids) {
+            $instanceids = array_values(array_unique(array_filter($instanceids)));
+            if (empty($instanceids)) {
+                continue;
+            }
+
+            $fields = ['id', 'timemodified'];
+            if ($dbman->field_exists($modname, 'intro')) {
+                $fields[] = 'intro';
+            }
+
+            $recordsbyinstance = $DB->get_records_list(
+                $modname,
+                'id',
+                $instanceids,
+                '',
+                implode(', ', $fields)
+            );
+
+            foreach ($recordsbyinstance as $instanceid => $instancerecord) {
+                $metadata[$modname][(int)$instanceid] = [
+                    'timemodified' => $instancerecord->timemodified ?? null,
+                    'intro' => $instancerecord->intro ?? '',
+                ];
+            }
+        }
+
+        return $metadata;
     }
 }

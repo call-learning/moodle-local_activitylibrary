@@ -135,6 +135,34 @@ final class get_filtered_activities_test extends testcase {
     }
 
     /**
+     * Test fulltext search is case-insensitive for multibyte text.
+     *
+     * @covers \local_activitylibrary\external\get_filtered_activities::execute
+     * @runInSeparateProcess
+     */
+    public function test_get_filtered_activities_fulltext_filter_is_case_insensitive_for_utf8(): void {
+        $dg = $this->getDataGenerator();
+        $course = $dg->create_course();
+
+        $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Énergie solaire',
+            'intro' => 'Présentation générale',
+        ] + $this->get_simple_cf_data()));
+
+        $result = $this->get_filtered_activities(
+            [$course->id],
+            [
+                ['type' => 'fulltext', 'operator' => 0, 'value' => 'éNERGIE'],
+            ]
+        );
+        $activities = $result['entities'];
+
+        $this->assertCount(1, $activities);
+        $this->assertSame('Énergie solaire', $activities[0]['fullname']);
+    }
+
+    /**
      * Test sorting and pagination on retrieved activities.
      *
      * @covers \local_activitylibrary\external\get_filtered_activities::execute

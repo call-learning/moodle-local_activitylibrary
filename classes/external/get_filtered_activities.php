@@ -24,6 +24,7 @@
 
 namespace local_activitylibrary\external;
 
+use core_text;
 use context_course;
 use context_system;
 use core_course\external\course_module_summary_exporter;
@@ -310,8 +311,10 @@ class get_filtered_activities extends external_api {
             }
 
             if ($fulltext !== '') {
-                $description = $recorddata['description'] ?? '';
-                if (stripos($cm->name, $fulltext) === false && stripos($description, $fulltext) === false) {
+                $needle = core_text::strtolower($fulltext);
+                $name = core_text::strtolower($cm->name);
+                $description = core_text::strtolower($recorddata['description'] ?? '');
+                if (core_text::strpos($name, $needle) === false && core_text::strpos($description, $needle) === false) {
                     continue;
                 }
             }

@@ -32,16 +32,44 @@ namespace local_activitylibrary\local\filters;
  */
 class course_filter implements activitylibrary_filter_interface, static_filter_interface {
     /**
+     * Get selectable courses for the current catalogue scope.
+     *
+     * @return array
+     * @throws \dml_exception
+     */
+    protected static function get_course_choices(): array {
+        global $DB;
+
+        $scopeids = \local_activitylibrary\local\utils::get_catalog_scope_course_ids();
+        if (empty($scopeids)) {
+            return [];
+        }
+
+        [$insql, $params] = $DB->get_in_or_equal($scopeids, SQL_PARAMS_NAMED, 'courseid');
+        $courses = $DB->get_records_select(
+            'course',
+            "id {$insql} AND visible = 1",
+            $params,
+            'fullname ASC',
+            'id, fullname'
+        );
+
+        $choices = [];
+        foreach ($courses as $course) {
+            $choices[(int)$course->id] = format_string($course->fullname, true);
+        }
+
+        return $choices;
+    }
+
+    /**
      * Add to form.
      *
      * @param \MoodleQuickForm $mform
      * @throws \coding_exception
      */
     public function add_to_form(\MoodleQuickForm &$mform) {
-        $choices = ['' => get_string('filter:anyvalue', 'local_activitylibrary')];
-        foreach (enrol_get_my_courses(['id', 'fullname'], 'fullname ASC') as $course) {
-            $choices[(int)$course->id] = format_string($course->fullname, true);
-        }
+        $choices = ['' => get_string('filter:anyvalue', 'local_activitylibrary')] + self::get_course_choices();
 
         utils::add_filter_operators_to_form($mform, 'course', 'course', self::OPERATOR_EQUAL);
         $elementname = 'course[value]';

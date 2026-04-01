@@ -24,6 +24,7 @@
 namespace local_activitylibrary;
 
 use local_activitylibrary\customfield\coursemodule_handler;
+use local_activitylibrary\local\filters\course_filter;
 use local_activitylibrary\local\utils;
 use local_activitylibrary\test\testcase;
 
@@ -108,5 +109,31 @@ final class filters_test extends testcase {
         $this->assertTrue(utils::is_field_hidden_filters($handler, 'f2'));
         $this->assertFalse(utils::is_field_hidden_filters($handler, 'f3'));
         $this->assertFalse(utils::is_field_hidden_filters($handler, 'f5'));
+    }
+
+    /**
+     * Test course filter choices exclude hidden and configured hidden courses.
+     *
+     * @covers \local_activitylibrary\local\filters\course_filter::add_to_form
+     * @runInSeparateProcess
+     */
+    public function test_course_filter_choices_exclude_hidden_courses(): void {
+        $dg = $this->getDataGenerator();
+
+        $visiblecourse = $dg->create_course(['fullname' => 'Visible course', 'visible' => 1]);
+        $configuredhidden = $dg->create_course(['fullname' => 'Configured hidden', 'visible' => 1]);
+        $hiddencourse = $dg->create_course(['fullname' => 'Hidden course', 'visible' => 0]);
+
+        set_config('hiddencoursesid', (string)$configuredhidden->id, 'local_activitylibrary');
+
+        $this->setAdminUser();
+
+        $method = new \ReflectionMethod(course_filter::class, 'get_course_choices');
+        $method->setAccessible(true);
+        $choices = $method->invoke(null);
+
+        $this->assertArrayHasKey($visiblecourse->id, $choices);
+        $this->assertArrayNotHasKey($configuredhidden->id, $choices);
+        $this->assertArrayNotHasKey($hiddencourse->id, $choices);
     }
 }

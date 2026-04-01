@@ -202,9 +202,9 @@ class customfield_utils {
      * @param int $offset
      * @param array $additionaljoins
      * @param array $additionalfields
-     * @param array $additionalwheres
+     * @param string $additionalwheres
      * @param array $additionalparams
-     * @param array $additionalsorts
+     * @param string $additionalsorts
      * @return array
      * @throws \ReflectionException
      * @throws \dml_exception

@@ -216,7 +216,7 @@
     font-style: italic;
 }
 
-.activitylibrary-filters-form #fgroup_id_buttonar .col-form-label {
+.activitylibrary-filters-form #fgroup_id_filtersubmitbuttons .col-form-label {
     display: none !important;
 }
 

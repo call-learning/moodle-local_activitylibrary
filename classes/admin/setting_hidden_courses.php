@@ -44,6 +44,8 @@ class setting_hidden_courses extends autocomplete {
             [
                 'placeholder' => get_string('searchcourses'),
                 'noselectionstring' => get_string('noselection', 'form'),
+                'manageurl' => false,
+                'managetext' => false,
             ]
         );
     }

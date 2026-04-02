@@ -308,6 +308,58 @@ final class get_filtered_activities_test extends testcase {
     }
 
     /**
+     * Test multiple selected tags are combined with OR semantics.
+     *
+     * @covers \local_activitylibrary\external\get_filtered_activities::execute
+     * @runInSeparateProcess
+     */
+    public function test_get_filtered_activities_tags_filter_with_multiple_values_returns_union(): void {
+        global $DB;
+
+        $dg = $this->getDataGenerator();
+        $course = $dg->create_course();
+
+        $activityone = $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Tagged one',
+        ] + $this->get_simple_cf_data()));
+        $activitytwo = $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Tagged two',
+        ] + $this->get_simple_cf_data()));
+        $activitythree = $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Tagged three',
+        ] + $this->get_simple_cf_data()));
+
+        $cmone = get_coursemodule_from_instance('label', $activityone->id, $course->id, false, MUST_EXIST);
+        $cmtwo = get_coursemodule_from_instance('label', $activitytwo->id, $course->id, false, MUST_EXIST);
+        $cmthree = get_coursemodule_from_instance('label', $activitythree->id, $course->id, false, MUST_EXIST);
+
+        \core_tag_tag::add_item_tag('core', 'course_modules', $cmone->id, \context_module::instance($cmone->id), 'Important');
+        \core_tag_tag::add_item_tag('core', 'course_modules', $cmtwo->id, \context_module::instance($cmtwo->id), 'Secondary');
+        \core_tag_tag::add_item_tag('core', 'course_modules', $cmthree->id, \context_module::instance($cmthree->id), 'Other');
+
+        $importanttagid = $DB->get_field('tag', 'id', ['rawname' => 'Important'], MUST_EXIST);
+        $secondarytagid = $DB->get_field('tag', 'id', ['rawname' => 'Secondary'], MUST_EXIST);
+
+        $result = $this->get_filtered_activities(
+            [$course->id],
+            [
+                ['type' => 'tags', 'operator' => 0, 'value' => $importanttagid . ',' . $secondarytagid],
+            ]
+        );
+
+        $activities = $result['entities'];
+        $returnednames = array_column($activities, 'fullname');
+        sort($returnednames);
+
+        $this->assertCount(2, $activities);
+        $this->assertSame(2, $result['totalcount']);
+        $this->assertSame(['Tagged one', 'Tagged two'], $returnednames);
+    }
+
+    /**
      * Test that invalid sort entries are ignored in SQL.
      *
      * @covers \local_activitylibrary\external\get_filtered_activities::get_sort_options_sql
@@ -495,6 +547,118 @@ final class get_filtered_activities_test extends testcase {
 
         $this->assertCount(1, $activities);
         $this->assertEquals('Match', $activities[0]['fullname']);
+    }
+
+    /**
+     * Test multiple selected values on a multiselect customfield return the union of matches.
+     *
+     * @covers \local_activitylibrary\external\get_filtered_activities::execute
+     * @runInSeparateProcess
+     */
+    public function test_get_filtered_activities_multiselect_filter_with_multiple_values_returns_union(): void {
+        if (!\local_activitylibrary\local\utils::is_multiselect_installed()) {
+            $this->markTestSkipped('Multiselect customfield is not installed.');
+        }
+
+        $dg = $this->getDataGenerator();
+        $course = $dg->create_course();
+
+        $firstdata = $this->get_simple_cf_data();
+        $firstdata['customfield_f4'] = [1];
+        $seconddata = $this->get_simple_cf_data();
+        $seconddata['customfield_f4'] = [2];
+        $thirddata = $this->get_simple_cf_data();
+        $thirddata['customfield_f4'] = [3];
+
+        $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Match one',
+        ] + $firstdata));
+        $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Match two',
+        ] + $seconddata));
+        $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'No match',
+        ] + $thirddata));
+
+        $result = $this->get_filtered_activities(
+            [$course->id],
+            [[
+                'type' => 'customfield',
+                'shortname' => 'f4',
+                'operator' => 1,
+                'value' => '1,2',
+            ]]
+        );
+
+        $activities = $result['entities'];
+        $returnednames = array_column($activities, 'fullname');
+        sort($returnednames);
+
+        $this->assertCount(2, $activities);
+        $this->assertSame(['Match one', 'Match two'], $returnednames);
+    }
+
+    /**
+     * Test different filters are combined with AND semantics.
+     *
+     * @covers \local_activitylibrary\external\get_filtered_activities::execute
+     * @runInSeparateProcess
+     */
+    public function test_get_filtered_activities_different_filters_are_combined_with_and(): void {
+        $dg = $this->getDataGenerator();
+        $course = $dg->create_course();
+
+        $matchdata = $this->get_simple_cf_data();
+        $matchdata['customfield_f1'] = 'alpha text';
+        $matchdata['customfield_f5'] = 2;
+
+        $wrongselectdata = $this->get_simple_cf_data();
+        $wrongselectdata['customfield_f1'] = 'alpha text';
+        $wrongselectdata['customfield_f5'] = 1;
+
+        $wrongtextdata = $this->get_simple_cf_data();
+        $wrongtextdata['customfield_f1'] = 'beta text';
+        $wrongtextdata['customfield_f5'] = 2;
+
+        $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Match both filters',
+        ] + $matchdata));
+        $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Matches text only',
+        ] + $wrongselectdata));
+        $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Matches select only',
+        ] + $wrongtextdata));
+
+        $result = $this->get_filtered_activities(
+            [$course->id],
+            [
+                [
+                    'type' => 'customfield',
+                    'shortname' => 'f1',
+                    'operator' => 1,
+                    'value' => 'alpha',
+                ],
+                [
+                    'type' => 'customfield',
+                    'shortname' => 'f5',
+                    'operator' => 1,
+                    'value' => '2',
+                ],
+            ]
+        );
+
+        $activities = $result['entities'];
+
+        $this->assertCount(1, $activities);
+        $this->assertSame(1, $result['totalcount']);
+        $this->assertSame('Match both filters', $activities[0]['fullname']);
     }
 
     /**

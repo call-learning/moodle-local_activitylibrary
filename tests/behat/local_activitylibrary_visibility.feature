@@ -25,3 +25,19 @@ Feature: As an admin I can hide an activity from the catalogue from its edit for
     And I navigate to activity library "Home" page
     When I wait until the page is ready
     Then I should not see "Catalogue Activity"
+
+  Scenario: Student with a single hidden catalogue course sees an empty catalogue without invalid response
+    Given the following "users" exist:
+      | username | firstname | lastname | email                |
+      | student1 | Test      | Student  | student1@example.com |
+    And the following "course enrolments" exist:
+      | user     | course | role    |
+      | student1 | C1     | student |
+    And I log in as "admin"
+    And I hide course "Course 1" from the activity library catalogue
+    And I log out
+    And I log in as "student1"
+    And I navigate to activity library "Home" page
+    When I wait until the page is ready
+    Then I should not see "Valeur retournée incorrecte détectée"
+    And I should see "Aucun résultats ! Veuillez sélectionner d'autres valeurs pour les filtres."

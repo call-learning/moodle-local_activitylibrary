@@ -142,7 +142,7 @@ class get_filtered_activities extends external_api {
 
         $scopeids = array_values(array_diff($scopeids, utils::get_hidden_course_ids()));
         if (empty($scopeids)) {
-            return [];
+            return self::empty_result();
         }
 
         $customfieldfilters = [];

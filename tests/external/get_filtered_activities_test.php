@@ -237,6 +237,34 @@ final class get_filtered_activities_test extends testcase {
     }
 
     /**
+     * Test an empty scoped catalogue still returns the expected external structure.
+     *
+     * @covers \local_activitylibrary\external\get_filtered_activities::execute
+     * @runInSeparateProcess
+     */
+    public function test_get_filtered_activities_returns_empty_result_when_all_scoped_courses_are_hidden(): void {
+        $dg = $this->getDataGenerator();
+        $course = $dg->create_course(['fullname' => 'Only hidden course']);
+        $student = $dg->create_user();
+        $dg->enrol_user($student->id, $course->id, 'student');
+
+        $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Hidden by course scope',
+            'visible' => 1,
+        ] + $this->get_simple_cf_data()));
+
+        set_config('hiddencoursesid', (string)$course->id, 'local_activitylibrary');
+        $this->setUser($student);
+        \course_modinfo::clear_instance_cache();
+
+        $result = $this->get_filtered_activities([]);
+
+        $this->assertSame([], $result['entities']);
+        $this->assertSame(0, $result['totalcount']);
+    }
+
+    /**
      * Test activity filters by tags.
      *
      * @covers \local_activitylibrary\external\get_filtered_activities::execute

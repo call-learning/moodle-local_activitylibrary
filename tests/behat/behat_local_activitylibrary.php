@@ -73,6 +73,20 @@ class behat_local_activitylibrary extends behat_base {
     }
 
     /**
+     * Hide a course from the catalogue using its fullname.
+     *
+     * @param string $coursefullname
+     * @Given /^I hide course "(?P<coursefullname_string>(?:[^"]|\\")*)" from the activity library catalogue$/
+     */
+    public function i_hide_course_from_the_activity_library_catalogue(string $coursefullname): void {
+        $courseid = $this->get_course_id($coursefullname);
+        $hiddenids = utils::parse_configured_ids((string)get_config('local_activitylibrary', 'hiddencoursesid'));
+        $hiddenids[] = $courseid;
+        $hiddenids = array_values(array_unique(array_filter(array_map('intval', $hiddenids))));
+        set_config('hiddencoursesid', implode(',', $hiddenids), 'local_activitylibrary');
+    }
+
+    /**
      * Set hidden filter state for a custom field shortname.
      *
      * @param string $shortname

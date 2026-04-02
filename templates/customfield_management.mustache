@@ -65,7 +65,7 @@
     <div class="row">
         <div class="col align-self-end">
             {{#usescategories}}
-            <a tabindex="0" role="button" class="btn btn-secondary float-right" data-role="addnewcategory">{{#str}}addnewcategory, core_customfield{{/str}}</a>
+            <a tabindex="0" role="button" class="btn btn-secondary float-end" data-role="addnewcategory">{{#str}}addnewcategory, core_customfield{{/str}}</a>
             {{/usescategories}}
         </div>
     </div>
@@ -88,7 +88,7 @@
                     </h3>
                 {{/usescategories}}
             </div>
-            <div class="col-auto text-right">
+            <div class="col-auto text-end">
                 {{{addfieldmenu}}}
             </div>
         </div>
@@ -99,8 +99,8 @@
                     <th scope="col" class="col-3">{{#str}} customfield, core_customfield {{/str}}</th>
                     <th scope="col" class="col-3">{{#str}} shortname, core_customfield {{/str}}</th>
                     <th scope="col" class="col-2">{{#str}} type, core_customfield {{/str}}</th>
-                    <th scope="col" class="col-2 text-right">{{#str}} manage:hiddenfilter, local_activitylibrary {{/str}}</th>
-                    <th scope="col" class="col-2 text-right">{{#str}} action, core_customfield {{/str}}</th>
+                    <th scope="col" class="col-2 text-end">{{#str}} manage:hiddenfilter, local_activitylibrary {{/str}}</th>
+                    <th scope="col" class="col-2 text-end">{{#str}} action, core_customfield {{/str}}</th>
 
                 </tr>
                 </thead>
@@ -118,7 +118,7 @@
                                    data-field-shortname="{{shortname}}"
                                    {{#hiddenstatus}}checked{{/hiddenstatus}}>
                         </td>
-                        <td class="col-2 text-right">
+                        <td class="col-2 text-end">
                             <a href="#" data-role="editfield" data-name="{{name}}" data-id="{{id}}">{{#pix}}
                                 t/edit, core, {{#str}} edit, moodle {{/str}} {{/pix}}</a>
                             <a href="#" data-id="{{id}}" data-role="deletefield">{{#pix}}

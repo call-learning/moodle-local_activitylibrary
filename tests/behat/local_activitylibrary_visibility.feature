@@ -40,4 +40,4 @@ Feature: As an admin I can hide an activity from the catalogue from its edit for
     And I navigate to activity library "Home" page
     When I wait until the page is ready
     Then I should not see "Valeur retournée incorrecte détectée"
-    And I should see "Aucun résultats ! Veuillez sélectionner d'autres valeurs pour les filtres."
+    And I should see "Nothing found ! Please select another filter."

@@ -58,6 +58,7 @@ class fulltext_filter implements activitylibrary_filter_interface, static_filter
         );
         $mform->addElement('text', $elementname, $this->get_label());
         $mform->setType($elementname, PARAM_TEXT);
+        $mform->addHelpButton($elementname, 'fulltext', 'local_activitylibrary');
     }
 
     /**

@@ -69,6 +69,7 @@ $string['filter:submit'] = 'Filter';
 $string['filter:tags'] = 'Tags';
 $string['filters'] = 'Filters';
 $string['fulltext'] = 'Search by text';
+$string['fulltext_help'] = 'Search does not cover the content of resources and activities.';
 $string['hiddenfromstudents'] = 'Closed';
 $string['hidefromcatalogue'] = 'Hide from catalogue';
 $string['hidefromcatalogue_help'] = 'If enabled, this activity will not appear in the activity library.';

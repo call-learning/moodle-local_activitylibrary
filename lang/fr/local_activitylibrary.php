@@ -72,6 +72,7 @@ $string['filter:submit'] = 'Filtrer';
 $string['filter:tags'] = 'Tags';
 $string['filters'] = 'Filtres';
 $string['fulltext'] = 'Recherche par texte';
+$string['fulltext_help'] = 'La recherche ne porte pas sur le contenu des ressources et activités.';
 $string['hiddenfromstudents'] = 'Cours fermé';
 $string['hidefromcatalogue'] = 'Masquer du catalogue';
 $string['hidefromcatalogue_help'] = 'Si activé, cette activité n\'apparaîtra pas dans la bibliothèque d\'activités.';

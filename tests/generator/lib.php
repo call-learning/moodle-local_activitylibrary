@@ -77,7 +77,13 @@ class local_activitylibrary_generator extends component_generator_base {
 
         $handler = \core_customfield\handler::get_handler($record->component, $record->area, $record->itemid);
         $categoryid = $handler->create_category($record->name);
-        return $handler->get_categories_with_fields()[$categoryid];
+        foreach ($handler->get_categories_with_fields() as $category) {
+            if ((int)$category->get('id') === (int)$categoryid) {
+                return $category;
+            }
+        }
+
+        throw new coding_exception('Unable to find the created custom field category.');
     }
 
     /**
@@ -145,7 +151,19 @@ class local_activitylibrary_generator extends component_generator_base {
 
         $field = field_controller::create(0, (object) ['type' => $record->type], $category);
         $handler->save_field_configuration($field, $record);
-        return $handler->get_categories_with_fields()[$field->get('categoryid')]->get_fields()[$field->get('id')];
+        foreach ($handler->get_categories_with_fields() as $fieldcategory) {
+            if ((int)$fieldcategory->get('id') !== (int)$field->get('categoryid')) {
+                continue;
+            }
+
+            foreach ($fieldcategory->get_fields() as $savedfield) {
+                if ((int)$savedfield->get('id') === (int)$field->get('id')) {
+                    return $savedfield;
+                }
+            }
+        }
+
+        throw new coding_exception('Unable to find the created custom field.');
     }
 
     /**

@@ -69,8 +69,8 @@ class fulltext_filter implements activitylibrary_filter_interface, static_filter
      */
     public function check_data($formdata) {
         $field = 'fulltext';
-        if (array_key_exists($field, (array)$formdata) && !empty($formdata->$field['value'])) {
-            return ['value' => (string)$formdata->$field['value']];
+        if (array_key_exists($field, (array)$formdata) && !empty($formdata->{$field}['value'])) {
+            return ['value' => (string)$formdata->{$field}['value']];
         }
         return false;
     }

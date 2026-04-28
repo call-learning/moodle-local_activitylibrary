@@ -155,6 +155,74 @@ final class utils_test extends testcase {
     }
 
     /**
+     * Test dedicated status deletion helper removes visibility rows.
+     *
+     * @covers \local_activitylibrary\local\utils::delete_activity_hidden_status
+     */
+    public function test_delete_activity_hidden_status_removes_status_record(): void {
+        global $DB;
+
+        $dg = $this->getDataGenerator();
+        $course = $dg->create_course();
+        $activity = $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Delete status target',
+        ] + $this->get_simple_cf_data()));
+        $cm = get_coursemodule_from_instance('label', $activity->id, $course->id, false, MUST_EXIST);
+
+        utils::set_activity_hidden_from_catalogue((int)$cm->id, true);
+        utils::delete_activity_hidden_status((int)$cm->id);
+
+        $this->assertFalse($DB->record_exists('local_activitylibrary_status', ['coursemoduleid' => $cm->id]));
+    }
+
+    /**
+     * Test orphaned status cleanup is a safe no-op when every status row still references a real module.
+     *
+     * @covers \local_activitylibrary\local\utils::delete_orphaned_hidden_activity_statuses
+     */
+    public function test_delete_orphaned_hidden_activity_statuses_is_noop_without_orphans(): void {
+        global $DB;
+
+        $dg = $this->getDataGenerator();
+        $course = $dg->create_course();
+        $activity = $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'No orphan target',
+        ] + $this->get_simple_cf_data()));
+        $cm = get_coursemodule_from_instance('label', $activity->id, $course->id, false, MUST_EXIST);
+
+        utils::set_activity_hidden_from_catalogue((int)$cm->id, true);
+        utils::delete_orphaned_hidden_activity_statuses();
+
+        $this->assertTrue($DB->record_exists('local_activitylibrary_status', ['coursemoduleid' => $cm->id]));
+    }
+
+    /**
+     * Test course module deletion removes visibility rows through the Moodle deletion flow.
+     *
+     * @covers \local_activitylibrary\local\observer\eventmanager::course_module_deleted
+     */
+    public function test_course_module_deleted_removes_status_record(): void {
+        global $DB;
+
+        $dg = $this->getDataGenerator();
+        $course = $dg->create_course();
+        $activity = $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Observer target',
+        ] + $this->get_simple_cf_data()));
+        $cm = get_coursemodule_from_instance('label', $activity->id, $course->id, false, MUST_EXIST);
+
+        utils::set_activity_hidden_from_catalogue((int)$cm->id, true);
+        $this->assertTrue($DB->record_exists('local_activitylibrary_status', ['coursemoduleid' => $cm->id]));
+
+        course_delete_module($cm->id);
+
+        $this->assertFalse($DB->record_exists('local_activitylibrary_status', ['coursemoduleid' => $cm->id]));
+    }
+
+    /**
      * Test available activity tags only expose tags from visible activities in scope.
      *
      * @covers \local_activitylibrary\local\utils::get_available_activity_tags

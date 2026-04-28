@@ -43,4 +43,16 @@ class eventmanager {
      */
     public static function course_created(\core\event\course_created $event) {
     }
+
+    /**
+     * Course module delete event observer.
+     *
+     * Remove any activity library visibility flags that still reference the deleted module.
+     *
+     * @param \core\event\course_module_deleted $event The course module deleted event.
+     * @return void
+     */
+    public static function course_module_deleted(\core\event\course_module_deleted $event): void {
+        \local_activitylibrary\local\utils::delete_activity_hidden_status((int)$event->objectid);
+    }
 }

@@ -32,4 +32,8 @@ $observers = [
         'eventname' => '\core\event\course_created',
         'callback' => '\local_activitylibrary\local\observer\eventmanager::course_created',
     ],
+    [
+        'eventname' => '\core\event\course_module_deleted',
+        'callback' => '\local_activitylibrary\local\observer\eventmanager::course_module_deleted',
+    ],
 ];

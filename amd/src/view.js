@@ -125,6 +125,20 @@ const updateResultsCount = (root, offset, entitiesLength, totalCount) => {
     root.find(Selectors.resultsCount.region).text(getResultsCountLabel(offset, entitiesLength, totalCount));
 };
 
+const updateResultsCountForPage = (root, state, pageNumber, limit) => {
+    const pageData = state.loadedPages[pageNumber];
+    if (!pageData) {
+        return;
+    }
+
+    updateResultsCount(
+        root,
+        limit * (pageNumber - 1),
+        pageData.entities.length,
+        pageData.totalcount
+    );
+};
+
 const removeHiddenCategoriesIfNeeded = (entities, showCategories) => {
     if (showCategories) {
         return entities;
@@ -185,6 +199,18 @@ const subscribeSetLimit = (root, state) => {
     });
 };
 
+const subscribePagesShown = (root, state) => {
+    const event = state.eventNamespace + PagedContentEvents.PAGES_SHOWN;
+    PubSub.subscribe(event, (pagesData) => {
+        if (!pagesData || !pagesData.length) {
+            return;
+        }
+
+        const currentPageData = pagesData[0];
+        updateResultsCountForPage(root, state, currentPageData.pageNumber, currentPageData.limit);
+    });
+};
+
 const initializePagedContent = (root, state) => {
     state.eventNamespace = 'local_activitylibrary' + root.attr('id') + '_' + Math.random();
 
@@ -206,14 +232,7 @@ const initializePagedContent = (root, state) => {
 
         if (state.lastPage === currentPage) {
             actions.allItemsLoaded(state.lastPage);
-            if (state.loadedPages[currentPage]) {
-                updateResultsCount(
-                    root,
-                    limit * (currentPage - 1),
-                    state.loadedPages[currentPage].entities.length,
-                    state.loadedPages[currentPage].totalcount
-                );
-            }
+            updateResultsCountForPage(root, state, currentPage, limit);
             return renderEntities(root, state.loadedPages[currentPage]);
         }
 
@@ -240,6 +259,7 @@ const initializePagedContent = (root, state) => {
     PagedContentFactory.createWithLimit(itemsPerPage, loadPages, config)
         .then((html, js) => {
             subscribeSetLimit(root, state);
+            subscribePagesShown(root, state);
             return Templates.replaceNodeContents(root.find(Selectors.entityView.region), html, js);
         })
         .done(dispatchCardsRenderedEvent)

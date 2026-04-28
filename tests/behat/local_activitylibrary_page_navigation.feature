@@ -40,9 +40,20 @@ Feature: As an admin I should be able to paginate activities in the activity lib
     And I should see "Page 01"
     And I should see "Page 11"
     And I should not see "Page 16"
-    And I click on "2" "link"
+    And I click on "next" "local_activitylibrary > Pagination control"
     When I should see "Page 16"
     Then I should see "Page 18"
+
+  Scenario: Results count updates when returning to a previous page
+    Given I am on site homepage
+    And I log in as "admin"
+    And I navigate to activity library "Home" page
+    And I wait until the page is ready
+    Then I should see "1-15 / 18"
+    And I click on "next" "local_activitylibrary > Pagination control"
+    And I should see "16-18 / 18"
+    When I click on "previous" "local_activitylibrary > Pagination control"
+    Then I should see "1-15 / 18"
 
   Scenario: If I toggle page limit between reloads, it should persist
     Given I am on site homepage
@@ -50,7 +61,7 @@ Feature: As an admin I should be able to paginate activities in the activity lib
     And I navigate to activity library "Home" page
     And I wait until the page is ready
     And I click on "Show 15 items per page" "button"
-    And I click on "25" "link"
+    And I click on "25" "local_activitylibrary > Items per page option"
     And I should see "Page 18"
     And I reload the page
     When I should see "Page 18"

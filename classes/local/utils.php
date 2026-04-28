@@ -110,7 +110,12 @@ class utils {
             return [];
         }
 
-        $records = $DB->get_records('local_activitylibrary_status', ['visibility' => self::ITEM_HIDDEN], '', 'coursemoduleid');
+        $sql = "SELECT las.coursemoduleid
+                  FROM {local_activitylibrary_status} las
+                  JOIN {course_modules} cm
+                    ON cm.id = las.coursemoduleid
+                 WHERE las.visibility = :visibility";
+        $records = $DB->get_records_sql($sql, ['visibility' => self::ITEM_HIDDEN]);
         $ids = array_map(function (\stdClass $record): int {
             return (int)$record->coursemoduleid;
         }, $records);
@@ -210,6 +215,45 @@ class utils {
 
         $record->timecreated = time();
         $DB->insert_record('local_activitylibrary_status', $record);
+    }
+
+    /**
+     * Delete visibility records for a course module.
+     *
+     * @param int $coursemoduleid
+     * @return void
+     */
+    public static function delete_activity_hidden_status(int $coursemoduleid): void {
+        global $DB;
+
+        $DB->delete_records('local_activitylibrary_status', ['coursemoduleid' => $coursemoduleid]);
+    }
+
+    /**
+     * Delete orphaned visibility records that no longer reference an existing course module.
+     *
+     * @return void
+     */
+    public static function delete_orphaned_hidden_activity_statuses(): void {
+        global $DB;
+
+        $dbman = $DB->get_manager();
+        if (!$dbman->table_exists('local_activitylibrary_status')) {
+            return;
+        }
+
+        $sql = "SELECT las.coursemoduleid
+                  FROM {local_activitylibrary_status} las
+             LEFT JOIN {course_modules} cm
+                    ON cm.id = las.coursemoduleid
+                 WHERE cm.id IS NULL";
+        $orphanedids = $DB->get_fieldset_sql($sql);
+        if (empty($orphanedids)) {
+            return;
+        }
+
+        [$insql, $params] = $DB->get_in_or_equal($orphanedids, SQL_PARAMS_NAMED);
+        $DB->delete_records_select('local_activitylibrary_status', "coursemoduleid {$insql}", $params);
     }
 
     /**

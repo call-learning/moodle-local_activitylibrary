@@ -57,5 +57,11 @@ function xmldb_local_activitylibrary_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026033001, 'local', 'activitylibrary');
     }
 
+    if ($oldversion < 2026042800) {
+        \local_activitylibrary\local\utils::delete_orphaned_hidden_activity_statuses();
+
+        upgrade_plugin_savepoint(true, 2026042800, 'local', 'activitylibrary');
+    }
+
     return true;
 }

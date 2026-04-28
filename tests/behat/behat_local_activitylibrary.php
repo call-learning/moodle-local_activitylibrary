@@ -38,6 +38,37 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_base.php');
  */
 class behat_local_activitylibrary extends behat_base {
     /**
+     * Return the list of exact named selectors.
+     *
+     * @return behat_component_named_selector[]
+     */
+    public static function get_exact_named_selectors(): array {
+        return [
+            new behat_component_named_selector(
+                'Pagination control',
+                [
+                    <<<XPATH
+                    .//*[contains(concat(' ', normalize-space(@class), ' '), ' local-activitylibrary ')]
+                    //*[@data-region='paging-bar']//*[@data-region='page-item'][@data-control=%locator%]
+                    //*[@data-region='page-link']
+                    XPATH,
+                ],
+                false
+            ),
+            new behat_component_named_selector(
+                'Items per page option',
+                [
+                    <<<XPATH
+                    .//*[contains(concat(' ', normalize-space(@class), ' '), ' local-activitylibrary ')]
+                    //*[@data-region='paging-control-limit-container']//*[@data-limit=%locator%]
+                    XPATH,
+                ],
+                false
+            ),
+        ];
+    }
+
+    /**
      * Skip tagged scenarios when the multiselect customfield plugin is unavailable.
      *
      * @BeforeScenario @activitylibrary_requires_multiselect

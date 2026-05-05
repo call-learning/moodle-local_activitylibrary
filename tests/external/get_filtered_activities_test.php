@@ -237,6 +237,46 @@ final class get_filtered_activities_test extends testcase {
     }
 
     /**
+     * Test activities whose module type is disabled site-wide are excluded.
+     *
+     * @covers \local_activitylibrary\external\get_filtered_activities::execute
+     * @runInSeparateProcess
+     */
+    public function test_get_filtered_activities_excludes_disabled_module_types(): void {
+        global $DB;
+
+        $dg = $this->getDataGenerator();
+        $course = $dg->create_course();
+
+        $label = $dg->create_module('label', (object)([
+            'course' => $course->id,
+            'name' => 'Disabled module type activity',
+            'visible' => 1,
+        ] + $this->get_simple_cf_data()));
+        $page = $dg->create_module('page', (object)([
+            'course' => $course->id,
+            'name' => 'Available module type activity',
+            'visible' => 1,
+        ] + $this->get_simple_cf_data()));
+
+        $labelcm = get_coursemodule_from_instance('label', $label->id, $course->id, false, MUST_EXIST);
+        $pagecm = get_coursemodule_from_instance('page', $page->id, $course->id, false, MUST_EXIST);
+
+        $DB->set_field('modules', 'visible', 0, ['name' => 'label']);
+        \course_modinfo::clear_instance_cache();
+
+        $result = $this->get_filtered_activities([$course->id]);
+        $activities = $result['entities'];
+
+        $this->assertCount(1, $activities);
+        $this->assertSame(1, $result['totalcount']);
+        $this->assertSame('Available module type activity', $activities[0]['fullname']);
+        $this->assertSame('page', $activities[0]['modname']);
+        $this->assertSame((int)$pagecm->id, (int)$activities[0]['id']);
+        $this->assertNotSame((int)$labelcm->id, (int)$activities[0]['id']);
+    }
+
+    /**
      * Test an empty scoped catalogue still returns the expected external structure.
      *
      * @covers \local_activitylibrary\external\get_filtered_activities::execute

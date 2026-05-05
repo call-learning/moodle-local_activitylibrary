@@ -187,7 +187,7 @@ class get_filtered_activities extends external_api {
 
         [$insql, $inparams] = $DB->get_in_or_equal($scopeids, SQL_PARAMS_NAMED, 'courseid');
         $sqlparams = $inparams;
-        $sqlwhere = "e.course {$insql} AND e.visible = 1";
+        $sqlwhere = "e.course {$insql} AND e.visible = 1 AND m.visible = 1";
 
         $selectedmodules = array_values(array_unique(array_filter($selectedmodules)));
         if (!empty($selectedmodules)) {
@@ -268,7 +268,11 @@ class get_filtered_activities extends external_api {
                 continue;
             }
 
-            $cm = $modinfos[$record->parentid]->get_cm($record->id);
+            $coursecms = $modinfos[$record->parentid]->get_cms();
+            if (!isset($coursecms[$record->id])) {
+                continue;
+            }
+            $cm = $coursecms[$record->id];
             if (!$cm->uservisible) {
                 continue;
             }
